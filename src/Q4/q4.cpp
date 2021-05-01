@@ -7,6 +7,11 @@ using namespace std;
 
 vector<string> tokenize(string text, string delimiter);
 
+struct record
+{
+    string actor;
+    vector<string> movies;
+};
 int main()
 {
     // Input the data
@@ -27,7 +32,43 @@ int main()
         inputFile.close();
     }
 
-    cout << list[0][0] << " -> " << list[0][1] << endl;
+    // Move data into a more useful data structure
+    vector<record> records;
+
+    string currentActor = list[0][0];
+    record rec;
+    rec.actor = currentActor;
+    for (int i = 0; i < list.size(); i++)
+    {
+        // While the current actor is still the same
+        if (list[i][0] == currentActor)
+        {
+            // Add movies to their record
+            rec.movies.push_back(list[i][1]);
+        }
+        // If it changes
+        else
+        {
+            // Submit the previous record
+            records.push_back(rec);
+
+            // Update new current actor
+            currentActor = list[i][0];
+            rec.actor = currentActor;
+            rec.movies = {};
+            // Add this movie to their movie list
+            rec.movies.push_back(list[i][1]);
+        }
+    }
+
+    for (int i = 0; i < records.size(); i++)
+    {
+        cout << records[i].actor << endl;
+        for (int j = 0; j < records[i].movies.size(); j++)
+        {
+            cout << "   - " << records[i].movies[j] << endl;
+        }
+    }
     return 0;
 }
 
