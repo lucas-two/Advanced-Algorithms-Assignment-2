@@ -1,17 +1,24 @@
 /* Q4. Kevin Bacon Problem */
+// https://medium.com/swlh/a-path-finding-algorithm-1dd35f49c164
+// Going to use A* algorithm
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
-
-vector<string> tokenize(string text, string delimiter);
 
 struct record
 {
-    string actor;
-    vector<string> movies;
+    string actor;          // Actor's full name
+    int popularity;        // Number of movies the actor appears in
+    vector<string> movies; // A list of movies the actor appears in
 };
+
+vector<string> tokenize(string text, string delimiter);
+bool comparebyPopularity(const record &a, const record &b);
+
 int main()
 {
     // Input the data
@@ -32,12 +39,12 @@ int main()
         inputFile.close();
     }
 
-    // Move data into a more useful data structure
+    // Storing the data in a new record data structure
     vector<record> records;
-
     string currentActor = list[0][0];
     record rec;
     rec.actor = currentActor;
+    rec.popularity = 0;
     for (int i = 0; i < list.size(); i++)
     {
         // While the current actor is still the same
@@ -45,6 +52,7 @@ int main()
         {
             // Add movies to their record
             rec.movies.push_back(list[i][1]);
+            rec.popularity += 1;
         }
         // If it changes
         else
@@ -56,19 +64,26 @@ int main()
             currentActor = list[i][0];
             rec.actor = currentActor;
             rec.movies = {};
+            rec.popularity = 0;
             // Add this movie to their movie list
             rec.movies.push_back(list[i][1]);
+            rec.popularity += 1;
         }
     }
 
+    // Sort the records by popularity
+    stable_sort(records.begin(), records.end(), comparebyPopularity);
+
+    // Printing records from the new structure
     for (int i = 0; i < records.size(); i++)
     {
-        cout << records[i].actor << endl;
+        cout << "[" << records[i].popularity << "] " << records[i].actor << endl;
         for (int j = 0; j < records[i].movies.size(); j++)
         {
             cout << "   - " << records[i].movies[j] << endl;
         }
     }
+
     return 0;
 }
 
@@ -90,4 +105,9 @@ vector<string> tokenize(string text, string delimiter)
     words.push_back(text.substr(start, end - start));
 
     return words;
+}
+
+bool comparebyPopularity(const record &a, const record &b)
+{
+    return a.popularity > b.popularity;
 }
