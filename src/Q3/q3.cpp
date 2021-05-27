@@ -17,8 +17,9 @@ private:
     {
         bool red = true; // Whether the node is red (true) or black (false)
         int value;       // Value of the node
-        node *left;      // Pointer to the node's left child
-        node *right;     // Pointer to the node's right child
+        // node *parent;    // Pointer to the node's parent
+        node *left;  // Pointer to the node's left child
+        node *right; // Pointer to the node's right child
     };
 
     node *rootPointer; // Root node
@@ -40,18 +41,18 @@ private:
     {
         node *newNode = new node(); // Allocate memory for the new node
         newNode->value = value;     // Set it's value to the input value
-        newNode->left = NULL;       // Set left child as null
-        newNode->right = NULL;      // Set right child as null
-        return newNode;             // Return a pointer to the new node
+        // newNode->parent = parentNode; // Set the node's parent to the parent node
+        newNode->left = NULL;  // Set left child as null
+        newNode->right = NULL; // Set right child as null
+        return newNode;        // Return a pointer to the new node
     }
 
-    node *insertRecursively(int value, node *nodePointer)
+    void insertRecursively(int value, node *nodePointer)
     {
         // ROOT: Tree is empty and this is our root node
         if (treeIsEmpty())
         {
             rootPointer = createNewNode(value);
-            return rootPointer;
         }
 
         // LEFT: Value should be on the left of our node
@@ -66,7 +67,6 @@ private:
             else
             {
                 nodePointer->left = createNewNode(value);
-                return nodePointer->left;
             }
         }
         // RIGHT: Value should be on the right of our node
@@ -81,16 +81,13 @@ private:
             else
             {
                 nodePointer->right = createNewNode(value);
-                return nodePointer->right;
             }
         }
         // EQUAL: This is an error case. We don't want equal values.
         else
         {
             cout << "[!] DUPLICATE VALUE: Not accepting equal values." << endl;
-            return NULL;
         }
-        return NULL;
     }
 
     void printTreeRecursively(node *nodePointer)
@@ -101,7 +98,8 @@ private:
             {
                 printTreeRecursively(nodePointer->left);
             }
-            cout << nodePointer->value << " " << (nodePointer->red ? "Red" : "Black") << endl;
+
+            cout << nodePointer->value << " " << (nodePointer->red ? "(Red)" : "(Black)") << " Parent: " << endl;
 
             if (nodeExists(nodePointer->right))
             {
@@ -117,13 +115,27 @@ private:
     void fixViolations(node *Z)
     {
         // Z is the root
+
+        // -> Toggle it black
         cout << Z->value << endl;
 
         // Z's uncle is red
+        // -> Toggle Z's parent, grandparent, uncle
 
         // Z's uncle is black (triangle)
+        // (Z is left child, Z's parent is right child)
+        // OR
+        // (Z is right child, Z's parent is left child)
 
         // Z's uncle is black (line)
+    }
+
+    void leftRotate()
+    {
+    }
+
+    void rightRotate()
+    {
     }
 
     void search()
@@ -142,8 +154,7 @@ public:
 
     void insert(int value)
     {
-        node *insertedNodePointer = insertRecursively(value, rootPointer);
-        fixViolations(insertedNodePointer);
+        insertRecursively(value, rootPointer);
     }
 
     void printTree()
@@ -157,7 +168,13 @@ int main()
 {
     RedBlackTree rbt;
 
-    rbt.insert(2);
+    rbt.insert(5);
+    rbt.insert(4);
+    rbt.insert(1);
+    rbt.insert(10);
+    rbt.insert(11);
+    // rbt.insert(4);
+    // rbt.insert(6);
     rbt.printTree();
     return 0;
 }
