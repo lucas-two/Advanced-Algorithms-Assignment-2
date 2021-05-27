@@ -87,6 +87,31 @@ int main()
     return 0;
 }
 
+void bfs(vector<record> recs, string startActor, string endActor)
+{
+    vector<record> queue; // Want this to behave like a set.
+    int startActorIndex;
+
+    // Find the record for the start actor
+    for (int i = 0; i < recs.size(); i++)
+    {
+        if (recs[i].actor == startActor)
+        {
+            startActorIndex = i;
+            break;
+        }
+    }
+
+    // For each of the actor's movies
+    for (int i = 0; i < recs[startActorIndex].movies.size(); i++)
+    {
+        //
+    }
+
+    // Look through the actor's movies
+    // Add the children of the movie to the queue. (no duplicates!)
+}
+
 /* Splitting the input */
 // NOTE: I used a code example from GeeksForGeeks to create this.
 // It is not my original work, and I only slightly tweaked it.
