@@ -1,5 +1,6 @@
 /* Q3. Red Black Tree vs. Van Emde Boas Tree*/
 #include <iostream>
+#include <string>
 using namespace std;
 
 class RedBlackTree
@@ -17,9 +18,9 @@ private:
     {
         bool red = true; // Whether the node is red (true) or black (false)
         int value;       // Value of the node
-        // node *parent;    // Pointer to the node's parent
-        node *left;  // Pointer to the node's left child
-        node *right; // Pointer to the node's right child
+        node *parent;    // Pointer to the node's parent
+        node *left;      // Pointer to the node's left child
+        node *right;     // Pointer to the node's right child
     };
 
     node *rootPointer; // Root node
@@ -37,14 +38,14 @@ private:
     }
 
     /* Create a new node */
-    node *createNewNode(int value)
+    node *createNewNode(int value, node *parentNode)
     {
-        node *newNode = new node(); // Allocate memory for the new node
-        newNode->value = value;     // Set it's value to the input value
-        // newNode->parent = parentNode; // Set the node's parent to the parent node
-        newNode->left = NULL;  // Set left child as null
-        newNode->right = NULL; // Set right child as null
-        return newNode;        // Return a pointer to the new node
+        node *newNode = new node();   // Allocate memory for the new node
+        newNode->value = value;       // Set it's value to the input value
+        newNode->parent = parentNode; // Set the node's parent to the parent node
+        newNode->left = NULL;         // Set left child as null
+        newNode->right = NULL;        // Set right child as null
+        return newNode;               // Return a pointer to the new node
     }
 
     void insertRecursively(int value, node *nodePointer)
@@ -52,7 +53,7 @@ private:
         // ROOT: Tree is empty and this is our root node
         if (treeIsEmpty())
         {
-            rootPointer = createNewNode(value);
+            rootPointer = createNewNode(value, nodePointer);
         }
 
         // LEFT: Value should be on the left of our node
@@ -66,7 +67,7 @@ private:
             // Otherwise, create a new node there.
             else
             {
-                nodePointer->left = createNewNode(value);
+                nodePointer->left = createNewNode(value, nodePointer);
             }
         }
         // RIGHT: Value should be on the right of our node
@@ -80,7 +81,7 @@ private:
             // Otherwise, create a new node there.
             else
             {
-                nodePointer->right = createNewNode(value);
+                nodePointer->right = createNewNode(value, nodePointer);
             }
         }
         // EQUAL: This is an error case. We don't want equal values.
@@ -99,7 +100,7 @@ private:
                 printTreeRecursively(nodePointer->left);
             }
 
-            cout << nodePointer->value << " " << (nodePointer->red ? "(Red)" : "(Black)") << " Parent: " << endl;
+            cout << nodePointer->value << " " << (nodePointer->red ? "(Red)" : "(Black)") << " Parent: " << (nodePointer->parent == NULL ? "None" : to_string(nodePointer->parent->value)) << endl;
 
             if (nodeExists(nodePointer->right))
             {
