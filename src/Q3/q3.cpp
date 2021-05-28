@@ -37,6 +37,17 @@ private:
         return nodePointer != NULL;
     }
 
+    /* Check if the node is a left child of it's parent */
+    bool isLeftChild(node *nodePointer)
+    {
+        return nodePointer->parent->left == nodePointer;
+    }
+
+    void toggleColor(node *nodePointer)
+    {
+        nodePointer->red = !(nodePointer->red);
+    }
+
     /* Create a new node */
     node *createNewNode(int value, node *parentNode)
     {
@@ -54,6 +65,7 @@ private:
         if (treeIsEmpty())
         {
             rootPointer = createNewNode(value, nodePointer);
+            fixViolations(rootPointer);
         }
 
         // LEFT: Value should be on the left of our node
@@ -68,6 +80,7 @@ private:
             else
             {
                 nodePointer->left = createNewNode(value, nodePointer);
+                fixViolations(rootPointer->left);
             }
         }
         // RIGHT: Value should be on the right of our node
@@ -82,6 +95,7 @@ private:
             else
             {
                 nodePointer->right = createNewNode(value, nodePointer);
+                fixViolations(rootPointer->right);
             }
         }
         // EQUAL: This is an error case. We don't want equal values.
@@ -115,28 +129,95 @@ private:
 
     void fixViolations(node *Z)
     {
-        // Z is the root
+        // CASE I: Z is the root node
+        if (Z == rootPointer)
+        {
+            Z->red = false; // Set to black
+        }
 
-        // -> Toggle it black
-        cout << Z->value << endl;
+        // CASE II: Z's uncle is red
+        // -> (Parent is left child)
+        else if (isLeftChild(Z->parent) && Z->parent->parent->right->red)
+        {
+            toggleColor(Z->parent);                // Toggle Z's parent
+            toggleColor(Z->parent->parent);        // Toggle Z's grandparent
+            toggleColor(Z->parent->parent->right); // Toggle Z's uncle
+        }
+        // -> (Parent is right child)
+        else if (!isLeftChild(Z->parent) && Z->parent->parent->left->red)
+        {
+            toggleColor(Z->parent);               // Toggle Z's parent
+            toggleColor(Z->parent->parent);       // Toggle Z's grandparent
+            toggleColor(Z->parent->parent->left); // Toggle Z's uncle
+        }
 
-        // Z's uncle is red
-        // -> Toggle Z's parent, grandparent, uncle
+        // CASE III: Z's uncle is black (Zig-Zag)
+        // -> (Z is right child) & (Parent is left child)
+        else if (!isLeftChild(Z) && isLeftChild(Z->parent) && !(Z->parent->parent->right->red))
+        {
+            leftRotate(Z->parent);
+        }
+        // -> (Z is left child) & (Parent is right child)
+        else if (isLeftChild(Z) && !isLeftChild(Z->parent) && !(Z->parent->parent->right->red))
+        {
+            rightRotate(Z->parent);
+        }
 
-        // Z's uncle is black (triangle)
-        // (Z is left child, Z's parent is right child)
-        // OR
-        // (Z is right child, Z's parent is left child)
-
-        // Z's uncle is black (line)
+        // CASE IV: Z's uncle is black (Zig-Zig)
+        // -> (Z is right child) & (Parent is right child)
+        else if (!isLeftChild(Z) && !isLeftChild(Z->parent) && !(Z->parent->parent->right->red))
+        {
+            toggleColor(Z->parent);         // Toggle Z's parent
+            toggleColor(Z->parent->parent); // Toggle Z's grandparent
+            leftRotate(Z->parent->parent);
+        }
+        // -> (Z is left child) & (Parent is left child)
+        else if (isLeftChild(Z) && isLeftChild(Z->parent) && !(Z->parent->parent->right->red))
+        {
+            toggleColor(Z->parent);         // Toggle Z's parent
+            toggleColor(Z->parent->parent); // Toggle Z's grandparent
+            rightRotate(Z->parent->parent);
+        }
     }
 
-    void leftRotate()
+    void leftRotate(node *nodePointer)
     {
+        // Temp nodes
+        node *X = nodePointer;
+        node *Y = X->right;
+        node *Z = Y->left;
+
+        // Swap pointers
+        X->right = Z;
+        Y->left = X;
+
+        // Update parents
+        Y->left->right->parent = Y->left;
+        Y->left->parent = Y;
+        Y->parent = X->parent;
+
+        // Update to the rotated branch
+        nodePointer = Y;
     }
 
-    void rightRotate()
+    void rightRotate(node *nodePointer)
     {
+        // Temp nodes
+        node *Y = nodePointer;
+        node *X = Y->left;
+        node *Z = X->right;
+
+        // Swap pointers
+        Y->left = Z;
+        X->right = Y;
+
+        // Update parents
+        X->right->left->parent = X->right;
+        X->right->parent = X;
+        X->parent = Y->parent;
+
+        // Update to the rotated branch
+        nodePointer = X;
     }
 
     void search()
