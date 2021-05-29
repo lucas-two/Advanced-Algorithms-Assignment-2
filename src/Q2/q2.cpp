@@ -197,7 +197,7 @@ public:
 
 int main()
 {
-    Maze mz(10, 10);
+    Maze mz(50, 88);
 
     mz.printMaze();
     cout << endl;
