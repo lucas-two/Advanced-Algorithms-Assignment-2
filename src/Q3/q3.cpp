@@ -80,7 +80,8 @@ private:
             else
             {
                 nodePointer->left = createNewNode(value, nodePointer);
-                fixViolations(rootPointer->left);
+                cout << "Im about to fix..." << nodePointer->left->value << endl;
+                fixViolations(nodePointer->left);
             }
         }
         // RIGHT: Value should be on the right of our node
@@ -95,7 +96,7 @@ private:
             else
             {
                 nodePointer->right = createNewNode(value, nodePointer);
-                fixViolations(rootPointer->right);
+                fixViolations(nodePointer->right);
             }
         }
         // EQUAL: This is an error case. We don't want equal values.
@@ -129,11 +130,25 @@ private:
 
     void fixViolations(node *Z)
     {
+        cout << "You're now in the process of fixing..." << Z->value << endl;
         // CASE I: Z is the root node
         if (Z == rootPointer)
         {
             Z->red = false; // Set to black
         }
+
+        // If Z's parent is the root, the tree should be fine
+        else if (Z->parent->value == rootPointer->value)
+        {
+            cout << "Me: " << Z->value << endl;
+            cout << "My parent: " << Z->parent->value << endl;
+            cout << "Root: " << rootPointer->value << endl;
+            return;
+        }
+
+        // If Z has no uncle, but 
+
+
 
         // CASE II: Z's uncle is red
         // -> (Parent is left child)
