@@ -135,8 +135,6 @@ private:
     /* Build the maze using the random wall method*/
     void buildMaze()
     {
-        srand(0);
-
         // While we don't have a complete path
         while (!isComplete())
         {
@@ -154,6 +152,7 @@ private:
         }
     }
 
+    /* Generates an empty maze and fills it with a specified value */
     vector<vector<int>> generatEmptyMaze(int fillValue)
     {
         vector<vector<int>> emptyMaze(mazeHeight, vector<int>(mazeWidth, fillValue));
@@ -161,8 +160,11 @@ private:
     }
 
 public:
-    Maze(int width, int height)
+    Maze(int width, int height, int seed = 0)
     {
+        // Seed for random generation (default of 0)
+        srand(seed);
+
         // Input the maze height/width
         mazeWidth = width;
         mazeHeight = height;
@@ -187,19 +189,6 @@ public:
             for (int j = 0; j < maze[i].size(); j++)
             {
                 cout << maze[i][j] << " ";
-            }
-            cout << endl;
-        }
-    }
-
-    /* Print out the maze visited*/
-    void printMazeVisited()
-    {
-        for (int i = 0; i < mazeVisited.size(); i++)
-        {
-            for (int j = 0; j < mazeVisited[i].size(); j++)
-            {
-                cout << mazeVisited[i][j] << " ";
             }
             cout << endl;
         }
