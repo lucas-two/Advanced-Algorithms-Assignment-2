@@ -12,34 +12,15 @@ private:
         int x, y;
     };
 
-    int mazeWidth = 10; // Width of maze
-    int mazeHeight = 7; // Height of maze
-
-    vector<vector<int>> newMaze;
+    int mazeWidth, mazeHeight;
 
     // Our maze
     // Legend: Start (2) | End (3) | Wall (1) | Path (0)
-    vector<vector<int>> maze = {
-        {2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-        {0, 0, 1, 1, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 1, 1, 1, 0, 1, 0, 0},
-        {1, 1, 0, 0, 0, 1, 0, 1, 0, 1},
-        {0, 1, 1, 1, 0, 0, 0, 1, 0, 0},
-        {1, 0, 1, 1, 1, 1, 1, 1, 0, 1},
-        {1, 0, 1, 0, 1, 1, 1, 1, 0, 3},
-    };
+    vector<vector<int>> maze;
 
     // Copy of our maze, tracking visited paths
     // Legend: Visited (1) | Unvisited (0)
-    vector<vector<int>> mazeVisited = {
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    };
+    vector<vector<int>> mazeVisited;
 
     /* Check if a position has not been visited */
     bool isUnvisited(pos a)
@@ -63,18 +44,6 @@ private:
     bool isEnd(pos a)
     {
         return maze[a.y][a.x] == 3;
-    }
-
-public:
-    Maze(int width, int height)
-    {
-        // Input the maze height/width
-        mazeWidth = width;
-        mazeHeight = height;
-
-        // Generate empty maze
-        vector<vector<int>> emptyMaze(mazeHeight, vector<int>(mazeWidth, 0));
-        newMaze = emptyMaze;
     }
 
     /* Check if there is a path from start to end */
@@ -150,6 +119,24 @@ public:
         return false;
     }
 
+public:
+    Maze(int width, int height)
+    {
+        // Input the maze height/width
+        mazeWidth = width;
+        mazeHeight = height;
+
+        // Generate empty maze for tracking if visited
+        vector<vector<int>> emptyMazeVisited(mazeHeight, vector<int>(mazeWidth, 0));
+        mazeVisited = emptyMazeVisited;
+
+        // Generate empty maze filled with walls
+        vector<vector<int>> mazeEmpty(mazeHeight, vector<int>(mazeWidth, 1));
+        mazeEmpty[0][0] = 2;                          // Start
+        mazeEmpty[mazeHeight - 1][mazeWidth - 1] = 3; // End
+        maze = mazeEmpty;
+    }
+
     /* Print out the maze*/
     void printMaze()
     {
@@ -163,14 +150,14 @@ public:
         }
     }
 
-    /* Print out the maze*/
-    void printNewMaze()
+    /* Print out the maze visited*/
+    void printMazeVisited()
     {
-        for (int i = 0; i < newMaze.size(); i++)
+        for (int i = 0; i < mazeVisited.size(); i++)
         {
-            for (int j = 0; j < newMaze[i].size(); j++)
+            for (int j = 0; j < mazeVisited[i].size(); j++)
             {
-                cout << newMaze[i][j] << " ";
+                cout << mazeVisited[i][j] << " ";
             }
             cout << endl;
         }
@@ -181,7 +168,7 @@ int main()
 {
     Maze mz(10, 7);
     mz.printMaze();
-    mz.printNewMaze();
-    cout << "Is complete: " << mz.isComplete() << endl;
+    cout << endl;
+    mz.printMazeVisited();
     return 0;
 }
