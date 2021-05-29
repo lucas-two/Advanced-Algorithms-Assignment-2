@@ -12,20 +12,21 @@ private:
         int x, y;
     };
 
-    int height = 7; // Height of maze
-    int width = 10; // Width of maze
+    int mazeWidth = 10; // Width of maze
+    int mazeHeight = 7; // Height of maze
+
+    vector<vector<int>> newMaze;
 
     // Our maze
     // Legend: Start (2) | End (3) | Wall (1) | Path (0)
-    vector<vector<int>>
-        maze = {
-            {2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-            {0, 0, 1, 1, 1, 0, 0, 0, 0, 1},
-            {1, 0, 0, 1, 1, 1, 0, 1, 0, 0},
-            {1, 1, 0, 0, 0, 1, 0, 1, 0, 1},
-            {0, 1, 1, 1, 0, 0, 0, 1, 0, 0},
-            {1, 0, 1, 1, 1, 1, 1, 1, 0, 1},
-            {1, 0, 1, 0, 1, 1, 1, 1, 0, 3},
+    vector<vector<int>> maze = {
+        {2, 1, 1, 0, 1, 1, 1, 1, 1, 1},
+        {0, 0, 1, 1, 1, 0, 0, 0, 0, 1},
+        {1, 0, 0, 1, 1, 1, 0, 1, 0, 0},
+        {1, 1, 0, 0, 0, 1, 0, 1, 0, 1},
+        {0, 1, 1, 1, 0, 0, 0, 1, 0, 0},
+        {1, 0, 1, 1, 1, 1, 1, 1, 0, 1},
+        {1, 0, 1, 0, 1, 1, 1, 1, 0, 3},
     };
 
     // Copy of our maze, tracking visited paths
@@ -65,6 +66,17 @@ private:
     }
 
 public:
+    Maze(int width, int height)
+    {
+        // Input the maze height/width
+        mazeWidth = width;
+        mazeHeight = height;
+
+        // Generate empty maze
+        vector<vector<int>> emptyMaze(mazeHeight, vector<int>(mazeWidth, 0));
+        newMaze = emptyMaze;
+    }
+
     /* Check if there is a path from start to end */
     bool isComplete()
     {
@@ -103,7 +115,7 @@ public:
                 }
             }
             // East
-            if (current.x != width - 1)
+            if (current.x != mazeWidth - 1)
             {
                 // Add the east position to the queue if it's unvisited and able to be visited.
                 pos east = {start.x = current.x + 1, start.y = current.y};
@@ -113,7 +125,7 @@ public:
                 }
             }
             // South
-            if (current.y != height - 1)
+            if (current.y != mazeHeight - 1)
             {
                 // Add the south position to the queue if it's unvisited and able to be visited.
                 pos south = {start.x = current.x, start.y = current.y + 1};
@@ -150,12 +162,26 @@ public:
             cout << endl;
         }
     }
+
+    /* Print out the maze*/
+    void printNewMaze()
+    {
+        for (int i = 0; i < newMaze.size(); i++)
+        {
+            for (int j = 0; j < newMaze[i].size(); j++)
+            {
+                cout << newMaze[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
 };
 
 int main()
 {
-    Maze mz;
+    Maze mz(10, 7);
     mz.printMaze();
+    mz.printNewMaze();
     cout << "Is complete: " << mz.isComplete() << endl;
     return 0;
 }
