@@ -1,6 +1,7 @@
 /* Q2. Maze Generation */
 #include <iostream>
 #include <vector>
+#include <cmath>
 using namespace std;
 
 class Maze
@@ -13,6 +14,8 @@ private:
     };
 
     int mazeWidth, mazeHeight;
+
+    pos furthestFromStart, furthestFromEnd;
 
     // Our maze
     // Legend: Start (2) | End (3) | Wall (1) | Path (0)
@@ -56,6 +59,20 @@ private:
     bool breakWall(pos a)
     {
         return maze[a.y][a.x] = 0;
+    }
+
+    /* Calculate Manhattan distance between two points */
+    int calcManhattan(pos a, pos b)
+    {
+        // int yDiff = abs(a.y - b.y);
+        // int xDiff = abs(a.x - b.x);
+
+        // cout << "Y: " << yDiff << endl;
+        // cout << "X: " << xDiff << endl;
+
+        // cout << "SUM: " << abs(yDiff) + abs(xDiff) - 1 << endl;
+
+        return abs(a.y - b.y) + abs(a.x - b.x) - 1;
     }
 
     /* Check if there is a path from start to end */
@@ -181,6 +198,13 @@ public:
         buildMaze();
     }
 
+    void testDist()
+    {
+        pos one = {one.x = 1, one.y = 2};
+        pos two = {two.x = 4, two.y = 8};
+        cout << "DIST: " << calcManhattan(one, two) << endl;
+    }
+
     /* Print out the maze*/
     void printMaze()
     {
@@ -195,11 +219,15 @@ public:
     }
 };
 
+// Width + Height - 3
+
+// Find Closest point from [start]
+// Find closest point from [end]
+
 int main()
 {
-    Maze mz(50, 88);
-
+    Maze mz(3, 3);
     mz.printMaze();
-    cout << endl;
+    mz.testDist();
     return 0;
 }
