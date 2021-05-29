@@ -46,6 +46,18 @@ private:
         return maze[a.y][a.x] == 3;
     }
 
+    /* Check if a position is a wall */
+    bool isWall(pos a)
+    {
+        return maze[a.y][a.x] == 1;
+    }
+
+    /* Turn a wall into a path */
+    bool breakWall(pos a)
+    {
+        return maze[a.y][a.x] = 0;
+    }
+
     /* Check if there is a path from start to end */
     bool isComplete()
     {
@@ -116,7 +128,36 @@ private:
         }
 
         // We will reach here if the queue was exhaused and no end was found.
+        mazeVisited = generatEmptyMaze(0); // Reset the visited maze
         return false;
+    }
+
+    /* Build the maze using the random wall method*/
+    void buildMaze()
+    {
+        srand(0);
+
+        // While we don't have a complete path
+        while (!isComplete())
+        {
+            // Choose a random position in the maze
+            pos randomPos = {
+                randomPos.x = rand() % mazeWidth, // Range: 0 -> mazeWidth - 1
+                randomPos.y = rand() % mazeHeight // Range: 0 -> mazeHeight - 1
+            };
+
+            // If it's a wall, break it down
+            if (isWall(randomPos))
+            {
+                breakWall(randomPos);
+            }
+        }
+    }
+
+    vector<vector<int>> generatEmptyMaze(int fillValue)
+    {
+        vector<vector<int>> emptyMaze(mazeHeight, vector<int>(mazeWidth, fillValue));
+        return emptyMaze;
     }
 
 public:
@@ -127,14 +168,15 @@ public:
         mazeHeight = height;
 
         // Generate empty maze for tracking if visited
-        vector<vector<int>> emptyMazeVisited(mazeHeight, vector<int>(mazeWidth, 0));
-        mazeVisited = emptyMazeVisited;
+        mazeVisited = generatEmptyMaze(0);
 
         // Generate empty maze filled with walls
-        vector<vector<int>> mazeEmpty(mazeHeight, vector<int>(mazeWidth, 1));
-        mazeEmpty[0][0] = 2;                          // Start
-        mazeEmpty[mazeHeight - 1][mazeWidth - 1] = 3; // End
-        maze = mazeEmpty;
+        maze = generatEmptyMaze(1);
+        maze[0][0] = 2;                          // Start
+        maze[mazeHeight - 1][mazeWidth - 1] = 3; // End
+
+        // Build the maze
+        buildMaze();
     }
 
     /* Print out the maze*/
@@ -166,9 +208,9 @@ public:
 
 int main()
 {
-    Maze mz(10, 7);
+    Maze mz(10, 10);
+
     mz.printMaze();
     cout << endl;
-    mz.printMazeVisited();
     return 0;
 }
