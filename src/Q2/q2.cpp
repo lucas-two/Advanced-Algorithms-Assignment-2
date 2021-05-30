@@ -15,7 +15,7 @@ private:
 
     int mazeWidth, mazeHeight;
 
-    pos furthestFromStart, furthestFromEnd;
+    pos mazeStart, mazeEnd, furthestFromStart, furthestFromEnd;
 
     // Our maze
     // Legend: Start (2) | End (3) | Wall (1) | Path (0)
@@ -43,10 +43,10 @@ private:
         return maze[a.y][a.x] != 1;
     }
 
-    /* Check if the end is reached */
-    bool isEnd(pos a)
+    /* Check if positions are equal */
+    bool isGoal(pos a, pos b)
     {
-        return maze[a.y][a.x] == 3;
+        return a.y == b.y && a.x == b.x;
     }
 
     /* Check if a position is a wall */
@@ -64,23 +64,22 @@ private:
     /* Calculate Manhattan distance between two points */
     int calcManhattan(pos a, pos b)
     {
-        // int yDiff = abs(a.y - b.y);
-        // int xDiff = abs(a.x - b.x);
-
-        // cout << "Y: " << yDiff << endl;
-        // cout << "X: " << xDiff << endl;
-
-        // cout << "SUM: " << abs(yDiff) + abs(xDiff) - 1 << endl;
-
         return abs(a.y - b.y) + abs(a.x - b.x) - 1;
     }
 
-    /* Check if there is a path from start to end */
+    /* Check if there is a path between the start and end */
     bool isComplete()
     {
-        vector<pos> queue;                      // Queue storing valid positions
-        pos start = {start.x = 0, start.y = 0}; // Maze starting position
-        queue.push_back(start);                 // Insert starting position into the queue
+        // Run 2 BFSs: one from START -> END, and one from END -> START.
+        // If either return true, we know we've reached our goal.
+        return bfs(mazeStart, mazeEnd, &furthestFromStart) || bfs(mazeEnd, mazeStart, &furthestFromEnd);
+    }
+
+    /* Perform Breadth First Search */
+    bool bfs(pos origin, pos goal, pos *furthestToGoal)
+    {
+        vector<pos> queue;
+        queue.push_back(origin);
 
         // While the queue isn't empty
         while (!queue.empty())
@@ -89,8 +88,8 @@ private:
             pos current = queue[0];
             queue.erase(queue.begin());
 
-            // Check if we've reached the end position
-            if (isEnd(current))
+            // Check if we've reached the goal position
+            if (isGoal(current, goal))
             {
                 return true;
             }
@@ -99,47 +98,56 @@ private:
             if (isUnvisited(current))
             {
                 markAsVisited(current); // Mark as visited
-            }
 
-            // Check available positions:
-            // North
-            if (current.y != 0)
-            {
-                // Add the north position to the queue if it's unvisited and able to be visited.
-                pos north = {start.x = current.x, start.y = current.y - 1};
-                if (isUnvisited(north) && canVisit(north))
+                // Check if the current distance is greater than the best distance
+                // Update the best distance if so.
+                int bestDistance = calcManhattan(*furthestToGoal, origin);
+                int currentDistance = calcManhattan(current, origin);
+                if (currentDistance > bestDistance)
                 {
-                    queue.push_back(north);
+                    *furthestToGoal = current;
                 }
-            }
-            // East
-            if (current.x != mazeWidth - 1)
-            {
-                // Add the east position to the queue if it's unvisited and able to be visited.
-                pos east = {start.x = current.x + 1, start.y = current.y};
-                if (isUnvisited(east) && canVisit(east))
+
+                // Check available positions:
+                // North
+                if (current.y != 0)
                 {
-                    queue.push_back(east);
+                    // Add the north position to the queue if it's unvisited and able to be visited.
+                    pos north = {origin.x = current.x, origin.y = current.y - 1};
+                    if (isUnvisited(north) && canVisit(north))
+                    {
+                        queue.push_back(north);
+                    }
                 }
-            }
-            // South
-            if (current.y != mazeHeight - 1)
-            {
-                // Add the south position to the queue if it's unvisited and able to be visited.
-                pos south = {start.x = current.x, start.y = current.y + 1};
-                if (isUnvisited(south) && canVisit(south))
+                // East
+                if (current.x != mazeWidth - 1)
                 {
-                    queue.push_back(south);
+                    // Add the east position to the queue if it's unvisited and able to be visited.
+                    pos east = {origin.x = current.x + 1, origin.y = current.y};
+                    if (isUnvisited(east) && canVisit(east))
+                    {
+                        queue.push_back(east);
+                    }
                 }
-            }
-            // West
-            if (current.x != 0)
-            {
-                // Add the south position to the queue if it's unvisited and able to be visited.
-                pos west = {start.x = current.x - 1, start.y = current.y};
-                if (isUnvisited(west) && canVisit(west))
+                // South
+                if (current.y != mazeHeight - 1)
                 {
-                    queue.push_back(west);
+                    // Add the south position to the queue if it's unvisited and able to be visited.
+                    pos south = {origin.x = current.x, origin.y = current.y + 1};
+                    if (isUnvisited(south) && canVisit(south))
+                    {
+                        queue.push_back(south);
+                    }
+                }
+                // West
+                if (current.x != 0)
+                {
+                    // Add the south position to the queue if it's unvisited and able to be visited.
+                    pos west = {origin.x = current.x - 1, origin.y = current.y};
+                    if (isUnvisited(west) && canVisit(west))
+                    {
+                        queue.push_back(west);
+                    }
                 }
             }
         }
@@ -149,22 +157,27 @@ private:
         return false;
     }
 
-    /* Build the maze using the random wall method*/
+    /* Build the maze by randomly knocking down walls */
     void buildMaze()
     {
-        // While we don't have a complete path
         while (!isComplete())
         {
-            // Choose a random position in the maze
-            pos randomPos = {
-                randomPos.x = rand() % mazeWidth, // Range: 0 -> mazeWidth - 1
-                randomPos.y = rand() % mazeHeight // Range: 0 -> mazeHeight - 1
-            };
-
-            // If it's a wall, break it down
-            if (isWall(randomPos))
+            int noOfWallsToBreak = calcManhattan(furthestFromStart, furthestFromEnd);
+            int wallsBroken = 0;
+            while (wallsBroken <= noOfWallsToBreak)
             {
-                breakWall(randomPos);
+                // Choose a random position in the maze
+                pos randomPos = {
+                    randomPos.x = rand() % mazeWidth, // Range: 0 -> mazeWidth - 1
+                    randomPos.y = rand() % mazeHeight // Range: 0 -> mazeHeight - 1
+                };
+
+                // If it's a wall, break it down
+                if (isWall(randomPos))
+                {
+                    breakWall(randomPos);
+                    wallsBroken += 1;
+                }
             }
         }
     }
@@ -191,18 +204,19 @@ public:
 
         // Generate empty maze filled with walls
         maze = generatEmptyMaze(1);
-        maze[0][0] = 2;                          // Start
-        maze[mazeHeight - 1][mazeWidth - 1] = 3; // End
+
+        // Adding in the start and end positions
+        mazeStart = {mazeStart.x = 0, mazeStart.y = 0};
+        mazeEnd = {mazeEnd.x = mazeWidth - 1, mazeEnd.y = mazeHeight - 1};
+        maze[mazeStart.y][mazeStart.x] = 2;
+        maze[mazeEnd.y][mazeEnd.x] = 3;
+
+        // Initialise the pos furthest from start/end
+        furthestFromStart = mazeStart;
+        furthestFromEnd = mazeEnd;
 
         // Build the maze
         buildMaze();
-    }
-
-    void testDist()
-    {
-        pos one = {one.x = 1, one.y = 2};
-        pos two = {two.x = 4, two.y = 8};
-        cout << "DIST: " << calcManhattan(one, two) << endl;
     }
 
     /* Print out the maze*/
@@ -216,18 +230,13 @@ public:
             }
             cout << endl;
         }
+        cout << endl;
     }
 };
 
-// Width + Height - 3
-
-// Find Closest point from [start]
-// Find closest point from [end]
-
 int main()
 {
-    Maze mz(3, 3);
+    Maze mz(50, 88);
     mz.printMaze();
-    mz.testDist();
     return 0;
 }
