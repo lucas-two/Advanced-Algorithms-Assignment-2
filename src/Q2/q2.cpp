@@ -18,8 +18,8 @@ private:
     pos mazeStart, mazeEnd, furthestFromStart, furthestFromEnd;
 
     // Our maze
-    // Legend: Start (2) | End (3) | Wall (1) | Path (0)
-    vector<vector<int>> maze;
+    // Legend: Start (S) | End (E) | Wall (X) | Path (O)
+    vector<vector<char>> maze;
 
     // Copy of our maze, tracking visited paths
     // Legend: Visited (1) | Unvisited (0)
@@ -37,12 +37,6 @@ private:
         mazeVisited[a.y][a.x] = 1;
     }
 
-    /* Check if a position can be visited (e.g. isn't 1) */
-    bool canVisit(pos a)
-    {
-        return maze[a.y][a.x] != 1;
-    }
-
     /* Check if positions are equal */
     bool isGoal(pos a, pos b)
     {
@@ -52,13 +46,13 @@ private:
     /* Check if a position is a wall */
     bool isWall(pos a)
     {
-        return maze[a.y][a.x] == 1;
+        return maze[a.y][a.x] == 'X';
     }
 
     /* Turn a wall into a path */
     bool breakWall(pos a)
     {
-        return maze[a.y][a.x] = 0;
+        return maze[a.y][a.x] = 'O';
     }
 
     /* Calculate Manhattan distance between two points */
@@ -114,7 +108,7 @@ private:
                 {
                     // Add the north position to the queue if it's unvisited and able to be visited.
                     pos north = {origin.x = current.x, origin.y = current.y - 1};
-                    if (isUnvisited(north) && canVisit(north))
+                    if (isUnvisited(north) && !isWall(north))
                     {
                         queue.push_back(north);
                     }
@@ -124,7 +118,7 @@ private:
                 {
                     // Add the east position to the queue if it's unvisited and able to be visited.
                     pos east = {origin.x = current.x + 1, origin.y = current.y};
-                    if (isUnvisited(east) && canVisit(east))
+                    if (isUnvisited(east) && !isWall(east))
                     {
                         queue.push_back(east);
                     }
@@ -134,7 +128,7 @@ private:
                 {
                     // Add the south position to the queue if it's unvisited and able to be visited.
                     pos south = {origin.x = current.x, origin.y = current.y + 1};
-                    if (isUnvisited(south) && canVisit(south))
+                    if (isUnvisited(south) && !isWall(south))
                     {
                         queue.push_back(south);
                     }
@@ -144,7 +138,7 @@ private:
                 {
                     // Add the south position to the queue if it's unvisited and able to be visited.
                     pos west = {origin.x = current.x - 1, origin.y = current.y};
-                    if (isUnvisited(west) && canVisit(west))
+                    if (isUnvisited(west) && !isWall(west))
                     {
                         queue.push_back(west);
                     }
@@ -153,7 +147,7 @@ private:
         }
 
         // We will reach here if the queue was exhaused and no end was found.
-        mazeVisited = generatEmptyMaze(0); // Reset the visited maze
+        mazeVisited = generatEmptyMazeInt(0); // Reset the visited maze
         return false;
     }
 
@@ -182,10 +176,17 @@ private:
         }
     }
 
-    /* Generates an empty maze and fills it with a specified value */
-    vector<vector<int>> generatEmptyMaze(int fillValue)
+    /* Generates an empty maze and fills it with a specified int value */
+    vector<vector<int>> generatEmptyMazeInt(int fillValue)
     {
         vector<vector<int>> emptyMaze(mazeHeight, vector<int>(mazeWidth, fillValue));
+        return emptyMaze;
+    }
+
+    /* Generates an empty maze and fills it with a specified char value */
+    vector<vector<char>> generatEmptyMazeChar(char fillValue)
+    {
+        vector<vector<char>> emptyMaze(mazeHeight, vector<char>(mazeWidth, fillValue));
         return emptyMaze;
     }
 
@@ -200,16 +201,16 @@ public:
         mazeHeight = height;
 
         // Generate empty maze for tracking if visited
-        mazeVisited = generatEmptyMaze(0);
+        mazeVisited = generatEmptyMazeInt(0);
 
         // Generate empty maze filled with walls
-        maze = generatEmptyMaze(1);
+        maze = generatEmptyMazeChar('X');
 
         // Adding in the start and end positions
         mazeStart = {mazeStart.x = 0, mazeStart.y = 0};
         mazeEnd = {mazeEnd.x = mazeWidth - 1, mazeEnd.y = mazeHeight - 1};
-        maze[mazeStart.y][mazeStart.x] = 2;
-        maze[mazeEnd.y][mazeEnd.x] = 3;
+        maze[mazeStart.y][mazeStart.x] = 'S';
+        maze[mazeEnd.y][mazeEnd.x] = 'E';
 
         // Initialise the pos furthest from start/end
         furthestFromStart = mazeStart;
