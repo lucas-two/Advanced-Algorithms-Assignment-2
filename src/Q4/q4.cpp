@@ -52,13 +52,32 @@ private:
         return a.popularity > b.popularity;
     }
 
+    /* Find the index of the actor in the actors list */
+    int findActorIndex(string actorName)
+    {
+        for (int i = 0; i < actors.size(); i++)
+        {
+            if (actors[i].name == actorName)
+            {
+                return i;
+            }
+        }
+
+        // Actor not found
+        cout << "[!] ERROR: Actor " << actorName << " not found." << endl;
+        return -1;
+    }
+
     void bfs(string startActor, string endActor)
     {
+        int actorIndex = findActorIndex(startActor);
+
+        cout << actorIndex;
         return;
     }
 
 public:
-    KevinBacon()
+    KevinBacon(string actorFrom, string actorTo)
     {
         // Input the data into a list (e.g. [[ActorName, MovieTitle]])
         vector<vector<string>> list;
@@ -94,8 +113,11 @@ public:
             a.movies.push_back(m);
         }
 
+        // BUG: For some reason this part is freaking out.
         // Sort the actors by popularity
-        stable_sort(actors.begin(), actors.end(), comparebyPopularity);
+        // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
+
+        bfs(actorFrom, actorTo);
     }
 
     /* Display movies an actor is in*/
@@ -120,7 +142,7 @@ public:
 
 int main()
 {
-    KevinBacon kb;
-    kb.printActors();
+    KevinBacon kb("Kevin Bacon (I)", "Morgan Freeman (I)");
+    // kb.printActors();
     return 0;
 }
