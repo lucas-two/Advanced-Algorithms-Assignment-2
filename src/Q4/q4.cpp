@@ -288,6 +288,10 @@ public:
         gatherActors();
         compileProductions();
 
+        // Make sure the input actors exist
+        getActor(actorFrom);
+        getActor(actorTo);
+
         // BUG: For some reason this part is freaking out.
         // Sort the actors by popularity
         // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
@@ -347,5 +351,7 @@ public:
 int main()
 {
     KevinBacon kb("Kevin Bacon (I)", "Alec Guinness");
+    KevinBacon kb2("Kevin Bacon (I)", "Bob Hawk");
+
     return 0;
 }
