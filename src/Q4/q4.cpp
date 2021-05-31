@@ -94,24 +94,6 @@ private:
         return NULL;
     }
 
-    // /* Find a movie cast from the productions list */
-    // vector<actor> *getCast(string movieTitle)
-    // {
-    //     production p = *getProduction(movieTitle);
-    //     return &p.cast;
-    // }
-
-    // /* Check if a movie production has been visited */
-    // bool movieVisited(string movieTitle)
-    // {
-    //     production p = *getProduction(movieTitle);
-    //     if (&p != NULL)
-    //     {
-    //         return p.visited;
-    //     }
-    //     return false;
-    // }
-
     int bfs(string startActor, string endActor)
     {
         vector<actor> queue;
@@ -131,23 +113,26 @@ private:
             actor current = queue[0];
             queue.erase(queue.begin());
 
-            // Check if unvisited
-            if (!current.visited)
+            cout << current.name << " (visited: " << (current.visited ? "yes" : "no")
+                 << ")" << endl;
+
+            current.visited = true; // Mark as visited
+
+            // For each of the actor's movies...
+            for (int i = 0; i < current.movies.size(); i++)
             {
-                current.visited = true; // Mark as visited
+                production p = *getProduction(current.movies[i].title);
 
-                // For each of the actor's movies...
-                for (int i = 0; i < current.movies.size(); i++)
+                // If the movie is unvisited...
+                if (!p.visited)
                 {
-                    production p = *getProduction(current.movies[i].title);
+                    p.visited = true; // Mark as visited
 
-                    // If the movie is unvisited...
-                    if (!p.visited)
+                    // For each actor in the cast...
+                    for (int j = 0; j < p.cast.size(); j++)
                     {
-                        p.visited = true; // Mark as visited
-
-                        // For each actor in the cast...
-                        for (int j = 0; j < p.cast.size(); j++)
+                        // If the actor is unvisited...
+                        if (!p.cast[j].visited)
                         {
                             // If we found the end actor, return our bacon score
                             if (p.cast[j].name == endActor)
@@ -198,7 +183,8 @@ private:
     void gatherActors()
     {
         // Initialise starting actor
-        actor a = {a.name = data[0][0], a.movies = {}, a.popularity = 0};
+        actor a;
+        a.name = data[0][0];
 
         // For each record in the data...
         for (int i = 0; i < data.size(); i++)
@@ -225,7 +211,9 @@ private:
                 a.popularity = a.movies.size(); // Update actor's popularity
                 actors.push_back(a);
                 // Reset the current actor
-                a = {a.name = data[i][0], a.movies = {}, a.popularity = 0};
+                a.name = data[i][0];
+                a.movies = {};
+                a.popularity = 0;
                 a.movies.push_back(m); // Add movie to the actor's list
             }
             else
@@ -292,8 +280,19 @@ public:
         // Sort the actors by popularity
         // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
 
-        int score = bfs(actorFrom, actorTo);
-        cout << "Bacon Score: " << score << endl;
+        // May be a bug with index 0
+        // it's thinking index 1 is the dude...
+
+        cout << "- Before - " << endl;
+        cout << "Name: " << actors[0].name << endl;
+        cout << "Visited: " << actors[0].visited << endl;
+        actors[0].visited = true;
+        cout << "- After - " << endl;
+        cout << "Name: " << actors[0].name << endl;
+        cout << "Visited: " << actors[0].visited << endl;
+
+        // int score = bfs(actorFrom, actorTo);
+        // cout << "Bacon Score: " << score << endl;
     }
 
     /* Display the cast members of a production */
@@ -346,7 +345,7 @@ public:
 
 int main()
 {
-    KevinBacon kb("Kevin Bacon (I)", "Morgan Freeman (I)");
+    KevinBacon kb("Kevin Bacon (I)", "Clark Gable");
     // kb.printActors();
     // kb.printMovies();
     // kb.printProductions();
