@@ -140,25 +140,34 @@ private:
         // For each record in the data...
         for (int i = 0; i < data.size(); i++)
         {
-            // If the actor's name changes
-            if (a.name != data[i][0])
-            {
-                // Update the popularity of the actor
-                a.popularity = a.movies.size();
-                // Add the actor to the list
-                actors.push_back(a);
-                // Update to the next actor + reset a
-                a = {a.name = data[i][0], a.movies = {}, a.popularity = 0};
-            }
-            // Add movie to the actor's list
             movie m;
             m.title = data[i][1];
-            a.movies.push_back(m);
-
             // Add movie to the movies list
             if (!isMovieInList(m))
             {
                 movies.push_back(m);
+            }
+
+            // If we've reached the end of our data
+            if (i == data.size() - 1)
+            {
+                a.movies.push_back(m);          // Add the movie to the actor's list
+                a.popularity = a.movies.size(); // Update actor's popularity
+                actors.push_back(a);            // Add actor to the actors list
+            }
+
+            // If the actor's name changes
+            else if (a.name != data[i][0])
+            {
+                a.popularity = a.movies.size(); // Update actor's popularity
+                actors.push_back(a);
+                // Reset the current actor
+                a = {a.name = data[i][0], a.movies = {}, a.popularity = 0};
+                a.movies.push_back(m); // Add movie to the actor's list
+            }
+            else
+            {
+                a.movies.push_back(m); // Add movie to the actor's list
             }
         }
     }
@@ -171,7 +180,9 @@ private:
         {
             movie m;
             m.title = movies[i].title;
-            production p = {p.productionMovie = m, p.cast = {}};
+            production p;
+            p.productionMovie = m;
+            p.cast = {};
 
             // For each actor...
             for (int j = 0; j < actors.size(); j++)
@@ -214,24 +225,17 @@ public:
         gatherActors();
         compileProductions();
 
-        cout << "Printing the actors.." << endl;
-        cout << "A.size(): " << actors.size() << endl;
-        cout << actors[0].name << endl;
-
-        // cout << productions[0].productionMovie.title << endl;
-        // cout << productions[0].cast[0].name << endl;
-
         // BUG: For some reason this part is freaking out.
         // Sort the actors by popularity
         // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
 
-        bfs(actorFrom, actorTo);
+        // bfs(actorFrom, actorTo);
     }
 
     /* Display the cast members of a production */
     void printProductionCast(production p)
     {
-        cout << p.productionMovie.title << endl;
+        cout << "[X]" << p.productionMovie.title << endl;
         for (int i = 0; i < p.cast.size(); i++)
         {
             cout << "   - " << p.cast[i].name << endl;
