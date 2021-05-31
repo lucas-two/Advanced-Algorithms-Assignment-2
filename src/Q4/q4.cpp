@@ -11,10 +11,10 @@ using namespace std;
 class KevinBacon
 {
 private:
+    // TODO: Remove the movie type.
     struct movie
     {
-        string title;         // Movie title
-        bool visited = false; // Have we visited the movie in BFS
+        string title; // Movie title
     };
     struct actor
     {
@@ -28,6 +28,7 @@ private:
     {
         movie productionMovie; // Movie
         vector<actor> cast;    // Cast of the movie
+        bool visited = false;  //Have we visited the production in BFS
     };
 
     vector<vector<string>> data; // List of all the data
@@ -78,20 +79,38 @@ private:
         return NULL;
     }
 
-    /* Find a movie cast from the productions list */
-    vector<actor> *getCast(string movieTitle)
+    production *getProduction(string movieTitle)
     {
         for (int i = 0; i < productions.size(); i++)
         {
             if (productions[i].productionMovie.title == movieTitle)
             {
-                return &productions[i].cast;
+                return &productions[i];
             }
         }
         // Movie not found
         cout << "[!] ERROR: Movie '" << movieTitle << "' not found." << endl;
+        exit(1);
         return NULL;
     }
+
+    // /* Find a movie cast from the productions list */
+    // vector<actor> *getCast(string movieTitle)
+    // {
+    //     production p = *getProduction(movieTitle);
+    //     return &p.cast;
+    // }
+
+    // /* Check if a movie production has been visited */
+    // bool movieVisited(string movieTitle)
+    // {
+    //     production p = *getProduction(movieTitle);
+    //     if (&p != NULL)
+    //     {
+    //         return p.visited;
+    //     }
+    //     return false;
+    // }
 
     int bfs(string startActor, string endActor)
     {
@@ -100,7 +119,10 @@ private:
         actor a = *getActor(startActor);
         queue.push_back(a);
 
-        // Level -> 0
+        // Tracking level
+        int baconScore = 0; // Number of actors jumped
+        int toExploreCurrent = 1;
+        int toExploreNext = 0;
 
         // While the queue isn't empty
         while (!queue.empty())
@@ -108,12 +130,6 @@ private:
             // Pop from queue
             actor current = queue[0];
             queue.erase(queue.begin());
-
-            // Check if we've reached the end actor
-            if (current.name == endActor)
-            {
-                return 1;
-            }
 
             // Check if unvisited
             if (!current.visited)
@@ -123,19 +139,44 @@ private:
                 // For each of the actor's movies...
                 for (int i = 0; i < current.movies.size(); i++)
                 {
-                    // Find the movie's cast
-                    vector<actor> cast = *getCast(current.movies[i].title);
+                    production p = *getProduction(current.movies[i].title);
 
-                    // For each actor in the cast...
-                    for (int j = 0; j < cast.size(); j++)
+                    // If the movie is unvisited...
+                    if (!p.visited)
                     {
-                        queue.push_back(cast[j]); // Add the actor to the queue
+                        p.visited = true; // Mark as visited
+
+                        // For each actor in the cast...
+                        for (int j = 0; j < p.cast.size(); j++)
+                        {
+                            // If we found the end actor, return our bacon score
+                            if (p.cast[j].name == endActor)
+                            {
+                                return baconScore + 1;
+                            }
+                            // Otherwise, add the actor to the queue
+                            else
+                            {
+                                toExploreNext += 1;
+                                queue.push_back(p.cast[j]); // Add the actor to the queue
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        return 1;
+            // Actor child has been explored
+            toExploreCurrent -= 1;
+            // If we've processed all the actors on this level
+            if (toExploreCurrent == 0)
+            {
+                baconScore += 1;                  // Increase the bacon score
+                toExploreCurrent = toExploreNext; // Update the 'current to explore' with the found 'next to explore'
+                toExploreNext = 0;                // Reset the to 'next to explore'
+            }
+        }
+        cout << "Cannot reach actor." << endl;
+        return -1;
     }
 
     /* Keep the movies list as a set */
@@ -251,7 +292,8 @@ public:
         // Sort the actors by popularity
         // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
 
-        bfs(actorFrom, actorTo);
+        int score = bfs(actorFrom, actorTo);
+        cout << "Bacon Score: " << score << endl;
     }
 
     /* Display the cast members of a production */
@@ -307,6 +349,6 @@ int main()
     KevinBacon kb("Kevin Bacon (I)", "Morgan Freeman (I)");
     // kb.printActors();
     // kb.printMovies();
-    kb.printProductions();
+    // kb.printProductions();
     return 0;
 }
