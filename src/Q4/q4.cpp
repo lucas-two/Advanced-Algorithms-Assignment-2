@@ -19,6 +19,10 @@ private:
         bool visited = false;  //Have we visited the actor in BFS
     };
 
+    // ISSUE:
+    // -> It's pulling actors from the cast.
+    // These do not have an accurate 'visited' state.
+
     struct production
     {
         string title;         // Movie title
@@ -26,11 +30,12 @@ private:
         bool visited = false; //Have we visited the production in BFS
     };
 
-    vector<vector<string>> data; // List of all the data
-
+    vector<vector<string>> data;    // List of all the data
     vector<string> movies;          // List of all movies
     vector<actor> actors;           // List of all actors
     vector<production> productions; // List of all movie productions
+
+    vector<actor> visitedActors;
 
     /* Splitting the input */
     vector<string> tokenize(string text, string delimiter)
@@ -71,6 +76,7 @@ private:
         }
         // Actor not found
         cout << "[!] ERROR: Actor '" << actorName << "' not found." << endl;
+        exit(1);
         return NULL;
     }
 
@@ -110,54 +116,56 @@ private:
 
             if (!current->visited)
             {
-                cout << "Before: " << current->name << " (visited: " << (current->visited ? "yes" : "no")
+                cout << "Visiting: " << current->name << " (visited: " << (current->visited ? "yes" : "no")
                      << ")" << endl;
                 current->visited = true; // Mark as visited
-                cout << "After: " << current->name << " (visited: " << (current->visited ? "yes" : "no")
-                     << ")" << endl;
-            }
 
-            // For each of the actor's movies...
-            for (int i = 0; i < current->movies.size(); i++)
-            {
-                production *p = getProduction(current->movies[i]);
-
-                // If the movie is unvisited...
-                if (!p->visited)
+                // For each of the actor's movies...
+                for (int i = 0; i < current->movies.size(); i++)
                 {
-                    p->visited = true; // Mark as visited
+                    production *p = getProduction(current->movies[i]);
 
-                    // For each actor in the cast...
-                    for (int j = 0; j < p->cast.size(); j++)
+                    // If the movie is unvisited...
+                    if (!p->visited)
                     {
-                        actor *a = &p->cast[j];
-                        // If the actor is unvisited...
-                        if (!a->visited)
+                        p->visited = true; // Mark as visited
+
+                        // For each actor in the cast...
+                        for (int j = 0; j < p->cast.size(); j++)
                         {
-                            // If we found the end actor, return our bacon score
-                            if (a->name == endActor)
+                            // NOTE: It's important that the actor comes from the
+                            // [actors] list instead of the [productions[x].cast] list.
+                            // This is because actors from the cast do not have an accurate
+                            // (visited) state.
+                            actor *a = getActor(p->cast[j].name);
+
+                            // If the actor is unvisited...
+                            if (!a->visited)
                             {
-                                return baconScore + 1;
-                            }
-                            // Otherwise, add the actor to the queue
-                            else
-                            {
-                                toExploreNext += 1;
-                                queue.push_back(a); // Add the actor to the queue
+                                // If we found the end actor, return our bacon score
+                                if (a->name == endActor)
+                                {
+                                    return baconScore + 1;
+                                }
+                                // Otherwise, add the actor to the queue
+                                else
+                                {
+                                    toExploreNext += 1;
+                                    queue.push_back(a); // Add the actor to the queue
+                                }
                             }
                         }
                     }
                 }
-            }
-
-            // Actor child has been explored
-            toExploreCurrent -= 1;
-            // If we've processed all the actors on this level
-            if (toExploreCurrent == 0)
-            {
-                baconScore += 1;                  // Increase the bacon score
-                toExploreCurrent = toExploreNext; // Update the 'current to explore' with the found 'next to explore'
-                toExploreNext = 0;                // Reset the to 'next to explore'
+                // Actor child has been explored
+                toExploreCurrent -= 1;
+                // If we've processed all the actors on this level
+                if (toExploreCurrent == 0)
+                {
+                    baconScore += 1;                  // Increase the bacon score
+                    toExploreCurrent = toExploreNext; // Update the 'current to explore' with the found 'next to explore'
+                    toExploreNext = 0;                // Reset the to 'next to explore'
+                }
             }
         }
         cout << "Cannot reach actor." << endl;
@@ -251,6 +259,12 @@ private:
         }
     }
 
+    bool isActorVisited(string actorName)
+    {
+        actor a = *getActor(actorName);
+        return a.visited;
+    }
+
 public:
     KevinBacon(string actorFrom, string actorTo)
     {
@@ -277,17 +291,6 @@ public:
         // BUG: For some reason this part is freaking out.
         // Sort the actors by popularity
         // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
-
-        // May be a bug with index 0
-        // it's thinking index 1 is the dude...
-
-        cout << "- Before - " << endl;
-        cout << "Name: " << actors[0].name << endl;
-        cout << "Visited: " << actors[0].visited << endl;
-        actors[0].visited = true;
-        cout << "- After - " << endl;
-        cout << "Name: " << actors[0].name << endl;
-        cout << "Visited: " << actors[0].visited << endl;
 
         int score = bfs(actorFrom, actorTo);
         cout << "Bacon Score: " << score << endl;
@@ -343,9 +346,6 @@ public:
 
 int main()
 {
-    KevinBacon kb("Kevin Bacon (I)", "Clark Gable");
-    // kb.printActors();
-    // kb.printMovies();
-    // kb.printProductions();
+    KevinBacon kb("Kevin Bacon (I)", "Alec Guinness");
     return 0;
 }
