@@ -96,9 +96,9 @@ private:
 
     int bfs(string startActor, string endActor)
     {
-        vector<actor> queue;
+        vector<actor *> queue;
         // Add starting actor to the queue
-        actor a = *getActor(startActor);
+        actor *a = getActor(startActor);
         queue.push_back(a);
 
         // Tracking level
@@ -110,32 +110,37 @@ private:
         while (!queue.empty())
         {
             // Pop from queue
-            actor current = queue[0];
+            actor *current = queue[0];
             queue.erase(queue.begin());
 
-            cout << current.name << " (visited: " << (current.visited ? "yes" : "no")
-                 << ")" << endl;
-
-            current.visited = true; // Mark as visited
+            if (!current->visited)
+            {
+                cout << "Before: " << current->name << " (visited: " << (current->visited ? "yes" : "no")
+                     << ")" << endl;
+                current->visited = true; // Mark as visited
+                cout << "After: " << current->name << " (visited: " << (current->visited ? "yes" : "no")
+                     << ")" << endl;
+            }
 
             // For each of the actor's movies...
-            for (int i = 0; i < current.movies.size(); i++)
+            for (int i = 0; i < current->movies.size(); i++)
             {
-                production p = *getProduction(current.movies[i].title);
+                production *p = getProduction(current->movies[i].title);
 
                 // If the movie is unvisited...
-                if (!p.visited)
+                if (!p->visited)
                 {
-                    p.visited = true; // Mark as visited
+                    p->visited = true; // Mark as visited
 
                     // For each actor in the cast...
-                    for (int j = 0; j < p.cast.size(); j++)
+                    for (int j = 0; j < p->cast.size(); j++)
                     {
+                        actor *a = &p->cast[j];
                         // If the actor is unvisited...
-                        if (!p.cast[j].visited)
+                        if (!a->visited)
                         {
                             // If we found the end actor, return our bacon score
-                            if (p.cast[j].name == endActor)
+                            if (a->name == endActor)
                             {
                                 return baconScore + 1;
                             }
@@ -143,7 +148,7 @@ private:
                             else
                             {
                                 toExploreNext += 1;
-                                queue.push_back(p.cast[j]); // Add the actor to the queue
+                                queue.push_back(a); // Add the actor to the queue
                             }
                         }
                     }
@@ -291,8 +296,8 @@ public:
         cout << "Name: " << actors[0].name << endl;
         cout << "Visited: " << actors[0].visited << endl;
 
-        // int score = bfs(actorFrom, actorTo);
-        // cout << "Bacon Score: " << score << endl;
+        int score = bfs(actorFrom, actorTo);
+        cout << "Bacon Score: " << score << endl;
     }
 
     /* Display the cast members of a production */
