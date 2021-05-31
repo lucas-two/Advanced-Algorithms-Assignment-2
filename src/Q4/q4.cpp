@@ -91,6 +91,14 @@ private:
 
     int bfs(string startActor, string endActor)
     {
+        // Convert data to more usable data structure
+        gatherActors();
+        compileProductions();
+
+        // Make sure the actors exist
+        getActor(startActor);
+        getActor(endActor);
+
         vector<actor *> queue;
         // Add starting actor to the queue
         actor *a = getActor(startActor);
@@ -271,9 +279,6 @@ public:
             }
             inputFile.close();
         }
-        // Convert data to more usable data structure
-        gatherActors();
-        compileProductions();
     }
 
     /* Display the cast members of a production */
@@ -326,10 +331,6 @@ public:
     /* Calculate links between two actors */
     void findMinLinks(string actorFrom, string actorTo)
     {
-        // Make sure the actors exist
-        getActor(actorFrom);
-        getActor(actorTo);
-
         int score = bfs(actorFrom, actorTo);
 
         if (score == -1)
@@ -351,6 +352,21 @@ public:
     /* Find actor with the highest Bacon number. */
     void findHighestBacon()
     {
+        string actorToBest;
+        int topScore;
+        for (int i = 0; i < actors.size(); i++)
+        {
+            string actorTo = actors[i].name;
+            int score = bfs("Kevin Bacon (I)", actorTo);
+            if (score > topScore)
+            {
+                topScore = score;
+                actorToBest = actorTo;
+            }
+        }
+        cout << "[Best Bacon Score]: "
+             << "Kevin Bacon (I)"
+             << " ---( " << topScore << " links )---> " << actorToBest << endl;
     }
 };
 
@@ -359,6 +375,6 @@ int main()
     KevinBacon kb;
     kb.findBaconNumber("Alec Guinness");
     kb.findMinLinks("Denise Dabrowski", "Roy C. Johnson");
-
+    kb.findHighestBacon();
     return 0;
 }
