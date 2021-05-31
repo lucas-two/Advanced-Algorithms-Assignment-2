@@ -63,28 +63,44 @@ private:
         return a.popularity > b.popularity;
     }
 
-    /* Find the index of the actor in the actors list */
-    int findActorIndex(string actorName)
+    /* Find a paticular actor from the actor's list */
+    actor *getActor(string actorName)
     {
         for (int i = 0; i < actors.size(); i++)
         {
             if (actors[i].name == actorName)
             {
-                return i;
+                return &actors[i];
             }
         }
-
         // Actor not found
-        cout << "[!] ERROR: Actor " << actorName << " not found." << endl;
-        return -1;
+        cout << "[!] ERROR: Actor '" << actorName << "' not found." << endl;
+        return NULL;
+    }
+
+    /* Find a movie cast from the productions list */
+    vector<actor> *getCast(string movieTitle)
+    {
+        for (int i = 0; i < productions.size(); i++)
+        {
+            if (productions[i].productionMovie.title == movieTitle)
+            {
+                return &productions[i].cast;
+            }
+        }
+        // Movie not found
+        cout << "[!] ERROR: Movie '" << movieTitle << "' not found." << endl;
+        return NULL;
     }
 
     int bfs(string startActor, string endActor)
     {
         vector<actor> queue;
         // Add starting actor to the queue
-        int actorIndex = findActorIndex(startActor);
-        queue.push_back(actors[actorIndex]);
+        actor a = *getActor(startActor);
+        queue.push_back(a);
+
+        // Level -> 0
 
         // While the queue isn't empty
         while (!queue.empty())
@@ -104,15 +120,21 @@ private:
             {
                 current.visited = true; // Mark as visited
 
-                // ... CODE HERE ...
-                // For each of the actor's movies -> return fetch it's actors.
+                // For each of the actor's movies...
                 for (int i = 0; i < current.movies.size(); i++)
                 {
+                    // Find the movie's cast
+                    vector<actor> cast = *getCast(current.movies[i].title);
+
+                    // For each actor in the cast...
+                    for (int j = 0; j < cast.size(); j++)
+                    {
+                        queue.push_back(cast[j]); // Add the actor to the queue
+                    }
                 }
             }
         }
 
-        cout << actorIndex;
         return 1;
     }
 
@@ -229,13 +251,13 @@ public:
         // Sort the actors by popularity
         // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
 
-        // bfs(actorFrom, actorTo);
+        bfs(actorFrom, actorTo);
     }
 
     /* Display the cast members of a production */
     void printProductionCast(production p)
     {
-        cout << "[X]" << p.productionMovie.title << endl;
+        cout << p.productionMovie.title << endl;
         for (int i = 0; i < p.cast.size(); i++)
         {
             cout << "   - " << p.cast[i].name << endl;
