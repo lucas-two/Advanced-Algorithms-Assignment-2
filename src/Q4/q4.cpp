@@ -58,12 +58,6 @@ private:
         return words;
     }
 
-    /* Comparison for sorting by actor popularity */
-    bool comparebyPopularity(const actor &a, const actor &b)
-    {
-        return a.popularity > b.popularity;
-    }
-
     /* Find a paticular actor from the actor's list */
     actor *getActor(string actorName)
     {
@@ -116,8 +110,6 @@ private:
 
             if (!current->visited)
             {
-                cout << "Visiting: " << current->name << " (visited: " << (current->visited ? "yes" : "no")
-                     << ")" << endl;
                 current->visited = true; // Mark as visited
 
                 // For each of the actor's movies...
@@ -142,6 +134,9 @@ private:
                             // If the actor is unvisited...
                             if (!a->visited)
                             {
+                                // cout << "[ " << current->name << " ] + "
+                                //      << "[ " << a->name << " ]"
+                                //      << "--> ( " << p->title << " ) " << endl;
                                 // If we found the end actor, return our bacon score
                                 if (a->name == endActor)
                                 {
@@ -168,7 +163,6 @@ private:
                 }
             }
         }
-        cout << "Cannot reach actor." << endl;
         return -1;
     }
 
@@ -259,14 +253,8 @@ private:
         }
     }
 
-    bool isActorVisited(string actorName)
-    {
-        actor a = *getActor(actorName);
-        return a.visited;
-    }
-
 public:
-    KevinBacon(string actorFrom, string actorTo)
+    KevinBacon()
     {
         // Input the data into a list (e.g. [[ActorName, MovieTitle]])
         ifstream inputFile("data.txt");
@@ -283,21 +271,9 @@ public:
             }
             inputFile.close();
         }
-
-        // Collecting all movies
+        // Convert data to more usable data structure
         gatherActors();
         compileProductions();
-
-        // Make sure the input actors exist
-        getActor(actorFrom);
-        getActor(actorTo);
-
-        // BUG: For some reason this part is freaking out.
-        // Sort the actors by popularity
-        // stable_sort(actors.begin(), actors.end(), comparebyPopularity);
-
-        int score = bfs(actorFrom, actorTo);
-        cout << "Bacon Score: " << score << endl;
     }
 
     /* Display the cast members of a production */
@@ -346,12 +322,43 @@ public:
             cout << movies[i] << endl;
         }
     }
+
+    /* Calculate links between two actors */
+    void findMinLinks(string actorFrom, string actorTo)
+    {
+        // Make sure the actors exist
+        getActor(actorFrom);
+        getActor(actorTo);
+
+        int score = bfs(actorFrom, actorTo);
+
+        if (score == -1)
+        {
+            cout << actorFrom << " ---/ No link /---> " << actorTo << endl;
+        }
+        else
+        {
+            cout << actorFrom << " ---( " << score << " links )---> " << actorTo << endl;
+        }
+    }
+
+    /* Calculate links between an actor and Kevin Bacon */
+    void findBaconNumber(string actorTo)
+    {
+        findMinLinks("Kevin Bacon (I)", actorTo);
+    }
+
+    /* Find actor with the highest Bacon number. */
+    void findHighestBacon()
+    {
+    }
 };
 
 int main()
 {
-    KevinBacon kb("Kevin Bacon (I)", "Alec Guinness");
-    KevinBacon kb2("Kevin Bacon (I)", "Bob Hawk");
+    KevinBacon kb;
+    kb.findBaconNumber("Alec Guinness");
+    kb.findMinLinks("Denise Dabrowski", "Roy C. Johnson");
 
     return 0;
 }
