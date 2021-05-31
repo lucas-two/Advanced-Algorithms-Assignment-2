@@ -11,29 +11,24 @@ using namespace std;
 class KevinBacon
 {
 private:
-    // TODO: Remove the movie type.
-    struct movie
-    {
-        string title; // Movie title
-    };
     struct actor
     {
-        string name;          // Actor name
-        vector<movie> movies; // Movies actor appears in
-        int popularity;       // No. of movies actor appears in
-        bool visited = false; //Have we visited the actor in BFS
+        string name;           // Actor name
+        vector<string> movies; // Movie titles actor appears in
+        int popularity;        // No. of movies actor appears in
+        bool visited = false;  //Have we visited the actor in BFS
     };
 
     struct production
     {
-        movie productionMovie; // Movie
-        vector<actor> cast;    // Cast of the movie
-        bool visited = false;  //Have we visited the production in BFS
+        string title;         // Movie title
+        vector<actor> cast;   // Cast of the movie
+        bool visited = false; //Have we visited the production in BFS
     };
 
     vector<vector<string>> data; // List of all the data
 
-    vector<movie> movies;           // List of all movies
+    vector<string> movies;          // List of all movies
     vector<actor> actors;           // List of all actors
     vector<production> productions; // List of all movie productions
 
@@ -83,7 +78,7 @@ private:
     {
         for (int i = 0; i < productions.size(); i++)
         {
-            if (productions[i].productionMovie.title == movieTitle)
+            if (productions[i].title == movieTitle)
             {
                 return &productions[i];
             }
@@ -125,7 +120,7 @@ private:
             // For each of the actor's movies...
             for (int i = 0; i < current->movies.size(); i++)
             {
-                production *p = getProduction(current->movies[i].title);
+                production *p = getProduction(current->movies[i]);
 
                 // If the movie is unvisited...
                 if (!p->visited)
@@ -172,11 +167,11 @@ private:
     /* Keep the movies list as a set */
     // NOTE: I tried using sets but this gave me a bug
     // that I wasn't able to solve.
-    bool isMovieInList(movie m)
+    bool isMovieInList(string m)
     {
         for (int i = 0; i < movies.size(); i++)
         {
-            if (m.title == movies[i].title)
+            if (m == movies[i])
             {
                 return true;
             }
@@ -194,8 +189,8 @@ private:
         // For each record in the data...
         for (int i = 0; i < data.size(); i++)
         {
-            movie m;
-            m.title = data[i][1];
+            string m = data[i][1];
+
             // Add movie to the movies list
             if (!isMovieInList(m))
             {
@@ -234,10 +229,8 @@ private:
         // For each movie...
         for (int i = 0; i < movies.size(); i++)
         {
-            movie m;
-            m.title = movies[i].title;
             production p;
-            p.productionMovie = m;
+            p.title = movies[i];
             p.cast = {};
 
             // For each actor...
@@ -247,7 +240,7 @@ private:
                 for (int k = 0; k < actors[j].movies.size(); k++)
                 {
                     // If the production movie is the same as the actor's movie
-                    if (p.productionMovie.title == actors[j].movies[k].title)
+                    if (p.title == actors[j].movies[k])
                     {
                         // Add the actor to the production cast
                         p.cast.push_back(actors[j]);
@@ -303,7 +296,7 @@ public:
     /* Display the cast members of a production */
     void printProductionCast(production p)
     {
-        cout << p.productionMovie.title << endl;
+        cout << p.title << endl;
         for (int i = 0; i < p.cast.size(); i++)
         {
             cout << "   - " << p.cast[i].name << endl;
@@ -325,7 +318,7 @@ public:
         cout << "[" << a.popularity << "] " << a.name << endl;
         for (int i = 0; i < a.movies.size(); i++)
         {
-            cout << "   - " << a.movies[i].title << endl;
+            cout << "   - " << a.movies[i] << endl;
         }
     }
 
@@ -343,7 +336,7 @@ public:
     {
         for (int i = 0; i < movies.size(); i++)
         {
-            cout << movies[i].title << endl;
+            cout << movies[i] << endl;
         }
     }
 };
