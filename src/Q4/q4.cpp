@@ -387,10 +387,12 @@ int main()
     kb.findBaconNumber("Steven Brill (I)");
     kb.findBaconNumber("Carrie Fisher");
     kb.findBaconNumber("Jorn Benzon");
+    kb.findBaconNumber("Billy Crystal");
 
     kb.findMinLinks("Denise Dabrowski", "Roy C. Johnson");
     kb.findMinLinks("Roman Bohnen", "Alan Rickman");
-    kb.findMinLinks("Roman Bohnen", "Alan Rickman");
+    kb.findMinLinks("Albert Brooks (I)", "Steve Buscemi");
+    kb.findMinLinks("Gino Corrado", "Tim Condren");
 
     kb.findHighestBacon();
     return 0;
