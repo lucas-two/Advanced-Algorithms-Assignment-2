@@ -141,12 +141,10 @@ private:
                             // If the actor is unvisited...
                             if (!a->visited)
                             {
-                                // cout << "[ " << current->name << " ] + "
-                                //      << "[ " << a->name << " ]"
-                                //      << "--> ( " << p->title << " ) " << endl;
                                 // If we found the end actor, return our bacon score
                                 if (a->name == endActor)
                                 {
+                                    resetVisited();
                                     return baconScore + 1;
                                 }
                                 // Otherwise, add the actor to the queue
@@ -170,6 +168,7 @@ private:
                 }
             }
         }
+        resetVisited();
         return -1;
     }
 
@@ -375,8 +374,6 @@ public:
                 topScore = score;
                 actorToBest = actorTo;
             }
-
-            resetVisited(); // Reset visited states
         }
         cout << actorToBest << " ---( " << topScore << " links )---> "
              << "Kevin Bacon (I)" << endl;
@@ -386,8 +383,15 @@ public:
 int main()
 {
     KevinBacon kb;
+
     kb.findBaconNumber("Steven Brill (I)");
+    kb.findBaconNumber("Carrie Fisher");
+    kb.findBaconNumber("Jorn Benzon");
+
     kb.findMinLinks("Denise Dabrowski", "Roy C. Johnson");
+    kb.findMinLinks("Roman Bohnen", "Alan Rickman");
+    kb.findMinLinks("Roman Bohnen", "Alan Rickman");
+
     kb.findHighestBacon();
     return 0;
 }
