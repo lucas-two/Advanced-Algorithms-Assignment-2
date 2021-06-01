@@ -96,6 +96,7 @@ private:
         }
     }
 
+    /* Perform Breadth First Search to find no. of links between actors */
     int bfs(string startActor, string endActor)
     {
         vector<actor *> queue;
