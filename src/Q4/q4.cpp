@@ -4,8 +4,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <set>
-#include <algorithm>
 using namespace std;
 
 class KevinBacon
@@ -360,7 +358,7 @@ public:
     /* Calculate links between an actor and Kevin Bacon */
     void findBaconNumber(string actorTo)
     {
-        findMinLinks("Kevin Bacon (I)", actorTo);
+        findMinLinks(actorTo, "Kevin Bacon (I)");
     }
 
     /* Find actor with the highest Bacon number. */
@@ -372,17 +370,6 @@ public:
         {
             string actorTo = actors[i].name;
             int score = bfs("Kevin Bacon (I)", actorTo);
-            // if (score == -1)
-            // {
-            //     cout << "Kevin Bacon (I)"
-            //          << " ---/ No link /---> " << actorTo << endl;
-            // }
-            // else
-            // {
-            //     cout << "Kevin Bacon (I)"
-            //          << " ---( " << score << " links )---> " << actorTo << endl;
-            // }
-
             if (score > topScore)
             {
                 topScore = score;
@@ -391,19 +378,13 @@ public:
 
             resetVisited(); // Reset visited states
         }
-        cout << "[Best Bacon Score]: "
-             << "Kevin Bacon (I)"
-             << " ---( " << topScore << " links )---> " << actorToBest << endl;
+        cout << actorToBest << " ---( " << topScore << " links )---> "
+             << "Kevin Bacon (I)" << endl;
     }
 };
 
 int main()
 {
-    //TODO: Swap the direction so it's Person --> Kevin bacon
-
-    // ERROR: It's coming up with No Link for each of the actors
-    // Even though there IS actually a link...
-    // Problem is likely within the resetting of the state...
     KevinBacon kb;
     kb.findBaconNumber("Steven Brill (I)");
     kb.findMinLinks("Denise Dabrowski", "Roy C. Johnson");
