@@ -19,10 +19,6 @@ private:
         bool visited = false;  //Have we visited the actor in BFS
     };
 
-    // ISSUE:
-    // -> It's pulling actors from the cast.
-    // These do not have an accurate 'visited' state.
-
     struct production
     {
         string title;         // Movie title
@@ -68,12 +64,12 @@ private:
                 return &actors[i];
             }
         }
-        // Actor not found
         cout << "[!] ERROR: Actor '" << actorName << "' not found." << endl;
         exit(1);
         return NULL;
     }
 
+    /* Get a specific production */
     production *getProduction(string movieTitle)
     {
         for (int i = 0; i < productions.size(); i++)
@@ -83,22 +79,27 @@ private:
                 return &productions[i];
             }
         }
-        // Movie not found
         cout << "[!] ERROR: Movie '" << movieTitle << "' not found." << endl;
         exit(1);
         return NULL;
     }
 
+    /* Reset the visited state of actors and productions */
+    void resetVisited()
+    {
+        for (int i = 0; i < actors.size(); i++)
+        {
+            actors[i].visited = false;
+        }
+
+        for (int i = 0; i < actors.size(); i++)
+        {
+            productions[i].visited = false;
+        }
+    }
+
     int bfs(string startActor, string endActor)
     {
-        // Convert data to more usable data structure
-        gatherActors();
-        compileProductions();
-
-        // Make sure the actors exist
-        getActor(startActor);
-        getActor(endActor);
-
         vector<actor *> queue;
         // Add starting actor to the queue
         actor *a = getActor(startActor);
@@ -279,6 +280,10 @@ public:
             }
             inputFile.close();
         }
+
+        // Convert data to more usable data structure
+        gatherActors();
+        compileProductions();
     }
 
     /* Display the cast members of a production */
@@ -303,10 +308,19 @@ public:
     /* Display movies an actor is in*/
     void printActorMovies(actor a)
     {
-        cout << "[" << a.popularity << "] " << a.name << endl;
+        cout << "[" << a.popularity << "] " << a.name << " --> visited: " << (a.visited ? "yes" : "no") << endl;
         for (int i = 0; i < a.movies.size(); i++)
         {
             cout << "   - " << a.movies[i] << endl;
+        }
+    }
+
+    /* Display movies an actor is in*/
+    void printActorsNoMovies()
+    {
+        for (int i = 0; i < actors.size(); i++)
+        {
+            cout << actors[i].name << " --> visited: " << (actors[i].visited ? "yes" : "no") << endl;
         }
     }
 
@@ -358,11 +372,24 @@ public:
         {
             string actorTo = actors[i].name;
             int score = bfs("Kevin Bacon (I)", actorTo);
+            // if (score == -1)
+            // {
+            //     cout << "Kevin Bacon (I)"
+            //          << " ---/ No link /---> " << actorTo << endl;
+            // }
+            // else
+            // {
+            //     cout << "Kevin Bacon (I)"
+            //          << " ---( " << score << " links )---> " << actorTo << endl;
+            // }
+
             if (score > topScore)
             {
                 topScore = score;
                 actorToBest = actorTo;
             }
+
+            resetVisited(); // Reset visited states
         }
         cout << "[Best Bacon Score]: "
              << "Kevin Bacon (I)"
@@ -372,8 +399,13 @@ public:
 
 int main()
 {
+    //TODO: Swap the direction so it's Person --> Kevin bacon
+
+    // ERROR: It's coming up with No Link for each of the actors
+    // Even though there IS actually a link...
+    // Problem is likely within the resetting of the state...
     KevinBacon kb;
-    kb.findBaconNumber("Alec Guinness");
+    kb.findBaconNumber("Steven Brill (I)");
     kb.findMinLinks("Denise Dabrowski", "Roy C. Johnson");
     kb.findHighestBacon();
     return 0;
