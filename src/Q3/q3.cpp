@@ -3,6 +3,19 @@
 #include <string>
 using namespace std;
 
+class VEB
+{
+    // We have a universe of keys
+    // But we only have a subset of those keys
+    // as actual keys.
+
+    // Tree stores a set of keys from the universe
+    // Keys must be integers
+
+    // We have a big array of size U (universe)
+    // And we mark 1 in the indicies that we have keys for
+};
+
 class RedBlackTree
 {
     /*
@@ -146,9 +159,7 @@ private:
             return;
         }
 
-        // If Z has no uncle, but 
-
-
+        // If Z has no uncle, but
 
         // CASE II: Z's uncle is red
         // -> (Parent is left child)

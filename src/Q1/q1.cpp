@@ -3,20 +3,186 @@
 #include <vector>
 using namespace std;
 
+class FibonacciHeap
+{
+private:
+    struct node
+    {
+        int value;
+        bool looser = false;
+        node *parent;
+        vector<node *> children;
+    };
+    node *minNode;
+    node *rootList;
+
+    /* Create a new node */
+    node *createNewNode(int value, node *parentNode)
+    {
+        node *newNode = new node();
+        newNode->value = value;
+        newNode->children = {};
+        return newNode;
+    }
+
+    /* Cleanup nodes with same degree */
+    void cleanup()
+    {
+        bool unionFound = true;
+        while (unionFound)
+        {
+            unionFound = findUnion();
+        }
+    }
+
+    /* Find and union the nodes with same degree */
+    bool findUnion()
+    {
+        for (int i = 0; i < rootList->children.size(); i++)
+        {
+            for (int j = 0; j < rootList->children.size(); j++)
+            {
+                // Skip if we're looking at the same node
+                if (rootList->children[i] == rootList->children[j])
+                {
+                    continue;
+                }
+
+                // Equal degrees
+                if (rootList->children[i]->children.size() == rootList->children[j]->children.size())
+                {
+                    unionTrees(rootList->children[i], rootList->children[j]);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /* Union two trees together */
+    void unionTrees(node *t1, node *t2)
+    {
+        if (t1->value < t2->value)
+        {
+            t2->parent = t1;
+            t1->children.push_back(t2);
+        }
+        else
+        {
+            t1->parent = t2;
+            t2->children.push_back(t1);
+        }
+    }
+
+    /* Update the min node */
+    void updateMinNode()
+    {
+        node *newMin = rootList->children[0];
+        for (int i = 1; i < rootList->children.size(); i++)
+        {
+            if (rootList->children[i]->value < newMin->value)
+            {
+                newMin = rootList->children[i];
+            }
+        }
+    }
+
+    /* Move a node into the root list */
+    void moveToRootList(node *n)
+    {
+        n->parent = NULL;
+        n->looser = false;
+        rootList->children.push_back(n);
+    }
+
+    /* Display the root list */
+    void printRootList()
+    {
+        cout << "Root List: ";
+        for (int i = 1; i < rootList->children.size(); i++)
+        {
+            cout << rootList->children[i]->value << " ";
+        }
+    }
+
+public:
+    /* Insert a value into the fib. heap */
+    void insert(int value)
+    {
+        node *nodeToInsert = createNewNode(value, NULL);
+        rootList->children.push_back(nodeToInsert);
+    }
+
+    /* Return the min value in the fib. heap */
+    int getMin()
+    {
+        return minNode->value;
+    }
+
+    /* Remove a value from the fib. heap */
+    void remove() {}
+};
+
+class KSmallest
+{
+private:
+    int N;          //No. of elements
+    int K;          //No. of smallest elements to track
+    int upperLimit; // Highest number allowed for random generation
+
+    vector<int> numbers;         // All numbers
+    vector<int> smallestNumbers; // Subset of the K smallest numbers
+
+    /* Generate a list of N random numbers */
+    void generateRandomNumbers()
+    {
+        for (int i = 0; i < N; i++)
+        {
+            int number = rand() % upperLimit;
+            numbers.push_back(number);
+        }
+    }
+
+    /* Find and store the k-smallest numbers */
+    void findKSmallest()
+    {
+    }
+
+    /* Print out all numbers */
+    void printNumbers()
+    {
+        for (int i = 0; i < N; i++)
+        {
+            cout << numbers[i] << endl;
+        }
+    }
+
+    /* Print out the k-smalelst numbers */
+    void printSmallestNumbers()
+    {
+        for (int i = 0; i < K; i++)
+        {
+            cout << smallestNumbers[i] << endl;
+        }
+    }
+
+public:
+    KSmallest(int noElements, int noKSmallestElements, int seed = 0, int maxValueLimit = 100)
+    {
+        N = noElements;
+        K = noKSmallestElements;
+        upperLimit = maxValueLimit;
+        srand(seed);
+
+        generateRandomNumbers();
+
+        printNumbers();
+    }
+};
+
 int main()
 {
-    const int N = 10;           // Number of elements
-    const int K = 3;            // K number of smallest elements to track
-    const int upperLimit = 100; // Random number generation limit
-    vector<int> numbers;        // List storing N random integers
-    srand(0);                   // Random number generation seed
-
-    // Insert random numbers into our list
-    for (int i = 0; i < N; i++)
-    {
-        int number = rand() % upperLimit;
-        numbers.push_back(i);
-    }
+    KSmallest ks(10, 3);
 
     return 0;
 }
