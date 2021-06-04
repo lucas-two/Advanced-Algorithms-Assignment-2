@@ -164,15 +164,18 @@ private:
     /* Update to or deal with looser nodes */
     void updateLooser(node *n)
     {
-        // If the node is a double looser
-        if (n->looser)
+        if (!inRootList(n))
         {
-            updateLooser(n->parent);
-            moveToRootList(n);
-        }
-        else
-        {
-            n->looser = true;
+            // If the node is a double looser
+            if (n->looser)
+            {
+                updateLooser(n->parent);
+                moveToRootList(n);
+            }
+            else
+            {
+                n->looser = true;
+            }
         }
     }
 
@@ -284,7 +287,6 @@ private:
                     // Storing the k-smallest
                     if (currentKNodes < K)
                     {
-                        cout << "Adding: " << numberToInsert << endl;
                         kSmallestNumbers.insert(numberToInsert);
                         currentKNodes += 1;
                     }
@@ -292,9 +294,7 @@ private:
                     {
                         if (numberToInsert < kSmallestNumbers.getMax())
                         {
-                            cout << "Removing: " << kSmallestNumbers.getMax() << endl;
                             kSmallestNumbers.removeMax();
-                            cout << "Adding: " << numberToInsert << endl;
                             kSmallestNumbers.insert(numberToInsert);
                         }
                     }
@@ -302,6 +302,15 @@ private:
                 }
             }
         }
+    }
+
+public:
+    KSmallest(int noElements, int noKSmallestElements, int seed = 0)
+    {
+        N = noElements;
+        K = noKSmallestElements;
+        srand(seed);
+        generateRandomNumbers();
     }
 
     /* Print out all numbers */
@@ -315,47 +324,19 @@ private:
         cout << endl;
     }
 
+    /* Print out the k-smalelst numbers */
     void printKSmallestNumbers()
     {
         cout << "K-Smallest Numbers: ";
         kSmallestNumbers.printHeap();
         cout << endl;
     }
-
-public:
-    KSmallest(int noElements, int noKSmallestElements, int seed = 0)
-    {
-        N = noElements;
-        K = noKSmallestElements;
-        srand(seed);
-        generateRandomNumbers();
-        printNumbers();
-        printKSmallestNumbers();
-    }
 };
 
 int main()
 {
-    KSmallest ks(10, 3);
-
-    // FibonacciHeap fh;
-    // fh.insert(5);
-    // fh.insert(3);
-    // fh.insert(6);
-    // fh.insert(7);
-    // fh.insert(2);
-    // fh.insert(8);
-    // fh.insert(12);
-    // fh.insert(14);
-    // fh.insert(1);
-    // fh.insert(23);
-    // fh.insert(19);
-    // fh.printHeap();
-    // fh.getMax();
-    // fh.remove(2);
-    // fh.getMax();
-    // fh.remove(3);
-    // fh.printHeap();
-
+    KSmallest ks(11, 3);
+    ks.printNumbers();
+    ks.printKSmallestNumbers();
     return 0;
 }
