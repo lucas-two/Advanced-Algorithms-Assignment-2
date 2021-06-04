@@ -161,20 +161,27 @@ private:
         }
     }
 
+    /* Update to or deal with looser nodes */
+    void updateLooser(node *n)
+    {
+        // If the node is a double looser
+        if (n->looser)
+        {
+            updateLooser(n->parent);
+            moveToRootList(n);
+        }
+        else
+        {
+            n->looser = true;
+        }
+    }
+
     /* Remove a node by its pointer from the fib. heap */
     void removeNode(node *n)
     {
         if (!inRootList(n))
         {
-            // If the node's parent is already a looser
-            if (n->parent->looser)
-            {
-                removeNode(n->parent);
-            }
-            else
-            {
-                n->parent->looser = true;
-            }
+            updateLooser(n->parent);
             removeFromParentsChildren(n);
             moveToRootList(n);
         }
@@ -307,10 +314,15 @@ int main()
     fh.insert(2);
     fh.insert(8);
     fh.insert(12);
+    fh.insert(14);
+    fh.insert(1);
+    fh.insert(23);
+    fh.insert(19);
     fh.printHeap();
     fh.getMin();
     fh.remove(2);
     fh.getMin();
+    fh.remove(3);
     fh.printHeap();
 
     return 0;
