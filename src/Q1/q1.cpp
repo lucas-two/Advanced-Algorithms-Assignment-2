@@ -14,7 +14,7 @@ private:
         node *parent;
         vector<node *> children;
     };
-    node *minNode = NULL;
+    node *maxNode = NULL;
     node *rootList = NULL;
     vector<node *> map;
 
@@ -35,7 +35,7 @@ private:
         {
             unionFound = findUnion();
         }
-        updateMinNode();
+        updateMaxNode();
     }
 
     /* Find and union the nodes with same degree */
@@ -65,7 +65,7 @@ private:
     /* Union two trees together */
     void unionTrees(node *t1, node *t2)
     {
-        if (t1->value < t2->value)
+        if (t1->value > t2->value)
         {
             removeFromParentsChildren(t2);
             t2->parent = t1;
@@ -79,19 +79,19 @@ private:
         }
     }
 
-    /* Update the min node */
-    void updateMinNode()
+    /* Update the max node */
+    void updateMaxNode()
     {
-        node *newMinNode = rootList->children[0];
+        node *newMaxNode = rootList->children[0];
 
         for (int i = 1; i < rootList->children.size(); i++)
         {
-            if (minNode == NULL || rootList->children[i]->value < newMinNode->value)
+            if (maxNode == NULL || rootList->children[i]->value > newMaxNode->value)
             {
-                newMinNode = rootList->children[i];
+                newMaxNode = rootList->children[i];
             }
         }
-        minNode = newMinNode;
+        maxNode = newMaxNode;
     }
 
     /* Move a node into the root list */
@@ -101,9 +101,9 @@ private:
         n->looser = false;
         rootList->children.push_back(n);
 
-        if (minNode == NULL || n->value < minNode->value)
+        if (maxNode == NULL || n->value > maxNode->value)
         {
-            minNode = n;
+            maxNode = n;
         }
     }
 
@@ -136,9 +136,9 @@ private:
                 {
                     return current->children[i];
                 }
-                // don't search the branch if the value is bigger than
+                // don't search the branch if the value is less than
                 // the one we're looking for.
-                if (current->children[i]->value < valueToFind)
+                if (current->children[i]->value > valueToFind)
                 {
                     queue.push_back(current->children[i]);
                 }
@@ -230,10 +230,10 @@ public:
         moveToRootList(nodeToInsert);
     }
 
-    /* Return the min value in the fib. heap */
-    void getMin()
+    /* Return the max value in the fib. heap */
+    void getMax()
     {
-        cout << "Min Node: " << (minNode == NULL ? "N/A" : to_string(minNode->value)) << endl;
+        cout << "Max Node: " << (maxNode == NULL ? "N/A" : to_string(maxNode->value)) << endl;
     }
 
     /* Remove a node by its value from the fib. heap */
@@ -247,56 +247,69 @@ public:
 class KSmallest
 {
 private:
-    int N;          //No. of elements
-    int K;          //No. of smallest elements to track
-    int upperLimit; // Highest number allowed for random generation
+    int N, K;
+    int currentKNodes = 0;
+    vector<int> numbers;
+    FibonacciHeap kSmallestNumbers;
 
-    vector<int> numbers;         // All numbers
-    vector<int> smallestNumbers; // Subset of the K smallest numbers
+    bool numberInList(int num)
+    {
+        for (int i = 0; i < numbers.size(); i++)
+        {
+            if (num == numbers[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /* Generate a list of N random numbers */
     void generateRandomNumbers()
     {
         for (int i = 0; i < N; i++)
         {
-            int number = rand() % upperLimit;
-            numbers.push_back(number);
+            bool uniqueNumberFound = false;
+            while (!uniqueNumberFound)
+            {
+                int randomNumber = rand() % (N * 10);
+                if (!numberInList(randomNumber))
+                {
+                    numbers.push_back(randomNumber);
+                    uniqueNumberFound = true;
+                }
+            }
         }
     }
 
-    /* Find and store the k-smallest numbers */
-    void findKSmallest()
+    void insertToKSmallest(int value)
     {
+        currentKNodes += 1;
+        kSmallestNumbers.insert(value);
+    }
+
+    void removeFromKSmallest(int value)
+    {
+        currentKNodes -= 1;
+        kSmallestNumbers.remove(value);
     }
 
     /* Print out all numbers */
     void printNumbers()
     {
-        for (int i = 0; i < N; i++)
+        for (const int &num : numbers)
         {
-            cout << numbers[i] << endl;
-        }
-    }
-
-    /* Print out the k-smalelst numbers */
-    void printSmallestNumbers()
-    {
-        for (int i = 0; i < K; i++)
-        {
-            cout << smallestNumbers[i] << endl;
+            cout << num << endl;
         }
     }
 
 public:
-    KSmallest(int noElements, int noKSmallestElements, int seed = 0, int maxValueLimit = 100)
+    KSmallest(int noElements, int noKSmallestElements, int seed = 0)
     {
         N = noElements;
         K = noKSmallestElements;
-        upperLimit = maxValueLimit;
         srand(seed);
-
         generateRandomNumbers();
-
         printNumbers();
     }
 };
@@ -306,7 +319,6 @@ int main()
     // KSmallest ks(10, 3);
 
     FibonacciHeap fh;
-
     fh.insert(5);
     fh.insert(3);
     fh.insert(6);
@@ -319,9 +331,9 @@ int main()
     fh.insert(23);
     fh.insert(19);
     fh.printHeap();
-    fh.getMin();
+    fh.getMax();
     fh.remove(2);
-    fh.getMin();
+    fh.getMax();
     fh.remove(3);
     fh.printHeap();
 
