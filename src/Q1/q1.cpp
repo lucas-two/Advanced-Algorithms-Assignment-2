@@ -93,7 +93,7 @@ private:
     /* Move a node into the root list */
     void moveToRootList(node *n)
     {
-        n->parent = NULL;
+        n->parent = rootList;
         n->looser = false;
         rootList->children.push_back(n);
 
@@ -199,7 +199,10 @@ public:
         if (!inRootList(n))
         {
             removeFromParentsChildren(n);
+            moveToRootList(n);
         }
+
+        removeFromParentsChildren(n);
 
         for (int i = 0; i < n->children.size(); i++)
         {
@@ -284,7 +287,9 @@ int main()
     fh.insert(12);
     fh.printRootList();
     fh.getMin();
-    fh.remove(3);
+    fh.remove(2);
+    fh.getMin();
+    fh.printRootList();
 
     return 0;
 }
