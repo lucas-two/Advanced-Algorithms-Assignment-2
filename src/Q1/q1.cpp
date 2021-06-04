@@ -194,12 +194,19 @@ private:
         cleanup();
     }
 
-    /* Priting children of a node */
+public:
+    FibonacciHeap()
+    {
+        rootList = createNewNode(-1, NULL);
+    }
+
+    /* Display the root list */
     void printChildren(node *n)
     {
         for (int i = 0; i < n->children.size(); i++)
         {
-            cout << n->children[i]->value << " " << n->value;
+            cout << n->children[i]->value << " ";
+
             if (!n->children[i]->children.empty())
             {
                 printChildren(n->children[i]);
@@ -207,36 +214,7 @@ private:
         }
     }
 
-    /* Display the root list */
-    void printChildrenFromStructure(node *n)
-    {
-        for (int i = 0; i < n->children.size(); i++)
-        {
-            cout << n->children[i]->value << "(parent: " << n->value << ") ";
-
-            if (!n->children[i]->children.empty())
-            {
-                cout << "[ ";
-                printChildrenFromStructure(n->children[i]);
-            }
-        }
-        cout << endl;
-    }
-
-public:
-    FibonacciHeap()
-    {
-        rootList = createNewNode(-1, NULL);
-    }
-
     /* Display structure of the heap */
-    void printHeapStructure()
-    {
-        cout << "Heap structure:" << endl;
-        printChildrenFromStructure(rootList);
-    }
-
-    /* Priting out the heap */
     void printHeap()
     {
         printChildren(rootList);
@@ -306,6 +284,7 @@ private:
                     // Storing the k-smallest
                     if (currentKNodes < K)
                     {
+                        cout << "Adding: " << numberToInsert << endl;
                         kSmallestNumbers.insert(numberToInsert);
                         currentKNodes += 1;
                     }
@@ -313,7 +292,9 @@ private:
                     {
                         if (numberToInsert < kSmallestNumbers.getMax())
                         {
+                            cout << "Removing: " << kSmallestNumbers.getMax() << endl;
                             kSmallestNumbers.removeMax();
+                            cout << "Adding: " << numberToInsert << endl;
                             kSmallestNumbers.insert(numberToInsert);
                         }
                     }
