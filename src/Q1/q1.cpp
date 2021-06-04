@@ -67,11 +67,13 @@ private:
     {
         if (t1->value < t2->value)
         {
+            removeFromParentsChildren(t2);
             t2->parent = t1;
             t1->children.push_back(t2);
         }
         else
         {
+            removeFromParentsChildren(t1);
             t1->parent = t2;
             t2->children.push_back(t1);
         }
@@ -81,9 +83,10 @@ private:
     void updateMinNode()
     {
         node *newMin = rootList->children[0];
+
         for (int i = 1; i < rootList->children.size(); i++)
         {
-            if (rootList->children[i]->value < newMin->value)
+            if (minNode == NULL || rootList->children[i]->value < newMin->value)
             {
                 newMin = rootList->children[i];
             }
@@ -194,6 +197,12 @@ public:
         if (n == NULL)
         {
             exit(1);
+        }
+
+        if (n == minNode)
+        {
+            cout << "Removing node is the min node" << endl;
+            minNode->value = 99999999;
         }
 
         if (!inRootList(n))
