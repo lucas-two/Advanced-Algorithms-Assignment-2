@@ -194,14 +194,26 @@ public:
     }
 
     /* Display the root list */
-    void printRootList()
+    void printChildren(node *n)
     {
-        cout << "Root List: ";
-        for (int i = 0; i < rootList->children.size(); i++)
+        for (int i = 0; i < n->children.size(); i++)
         {
-            cout << rootList->children[i]->value << " ";
+            cout << n->children[i]->value << "(parent: " << n->value << ") ";
+
+            if (!n->children[i]->children.empty())
+            {
+                cout << "[ ";
+                printChildren(n->children[i]);
+            }
         }
         cout << endl;
+    }
+
+    /* Display the root list */
+    void printHeap()
+    {
+        cout << "Heap:" << endl;
+        printChildren(rootList);
     }
 
     /* Insert a value into the fib. heap */
@@ -295,11 +307,11 @@ int main()
     fh.insert(2);
     fh.insert(8);
     fh.insert(12);
-    fh.printRootList();
+    fh.printHeap();
     fh.getMin();
     fh.remove(2);
     fh.getMin();
-    fh.printRootList();
+    fh.printHeap();
 
     return 0;
 }
