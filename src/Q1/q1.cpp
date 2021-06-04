@@ -1,6 +1,7 @@
 /* Q1. Number list, with k-smallest list */
 #include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
 
 class FibonacciHeap
@@ -127,18 +128,21 @@ public:
     /* Return the min value in the fib. heap */
     void getMin()
     {
-        if (minNode == NULL)
-        {
-            cout << "No min node" << endl;
-        }
-        else
-        {
-            cout << "Min node: " << minNode->value << endl;
-        }
+        cout << "Min Node: " << (minNode == NULL ? "N/A" : to_string(minNode->value)) << endl;
     }
 
     /* Remove a value from the fib. heap */
-    void remove() {}
+    void remove()
+    {
+        // Is the node in the root list?
+        // Delete it.
+        // -> Promote it's children to the root list.
+
+        // Otherwise...
+        //  Move the node to the root list
+        // Delete it.
+        // -> Promote it's children to the root list.
+    }
 };
 
 class KSmallest
