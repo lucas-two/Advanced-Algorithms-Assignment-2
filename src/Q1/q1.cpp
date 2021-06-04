@@ -17,6 +17,7 @@ private:
     node *maxNode = NULL;
     node *rootList = NULL;
     vector<node *> map;
+    int nodeCount;
 
     /* Create a new node */
     node *createNewNode(int value, node *parentNode)
@@ -144,8 +145,6 @@ private:
                 }
             }
         }
-        cout << "[!] Could not find the value (" << valueToFind << ") in the heap." << endl;
-        exit(1);
         return NULL;
     }
 
@@ -194,6 +193,7 @@ private:
             moveToRootList(n->children[i]);
         }
         n = NULL;
+        nodeCount -= 1;
         cleanup();
     }
 
@@ -217,6 +217,12 @@ public:
         }
     }
 
+    /* Returns number of nodes in the heap */
+    int getNodeCount()
+    {
+        return nodeCount;
+    }
+
     /* Display structure of the heap */
     void printHeap()
     {
@@ -228,6 +234,7 @@ public:
     {
         node *nodeToInsert = createNewNode(value, NULL);
         moveToRootList(nodeToInsert);
+        nodeCount += 1;
     }
 
     /* Return the max value in the fib. heap */
@@ -240,7 +247,10 @@ public:
     void remove(int value)
     {
         node *n = find(value);
-        removeNode(n);
+        if (n != NULL)
+        {
+            removeNode(n);
+        }
     }
 
     /* Remove the max node */
@@ -304,6 +314,14 @@ private:
         }
     }
 
+    // void generateKSmallest()
+    // {
+    //     for (int i = 0; i < N; i++)
+    //     {
+
+    //     }
+    // }
+
 public:
     KSmallest(int noElements, int noKSmallestElements, int seed = 0)
     {
@@ -331,11 +349,28 @@ public:
         kSmallestNumbers.printHeap();
         cout << endl;
     }
+
+    /* Remove a value from the list */
+    void removeNumber(int value)
+    {
+        for (int i = 0; i < numbers.size(); i++)
+        {
+            if (numbers[i] == value)
+            {
+                numbers.erase(numbers.begin() + i);
+                kSmallestNumbers.remove(value);
+            }
+        }
+    }
 };
 
 int main()
 {
-    KSmallest ks(11, 3);
+    KSmallest ks(10, 2);
+    ks.printNumbers();
+    ks.printKSmallestNumbers();
+    ks.removeNumber(12);
+    cout << "Removal..." << endl;
     ks.printNumbers();
     ks.printKSmallestNumbers();
     return 0;
