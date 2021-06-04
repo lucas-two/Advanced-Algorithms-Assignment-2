@@ -82,15 +82,16 @@ private:
     /* Update the min node */
     void updateMinNode()
     {
-        node *newMin = rootList->children[0];
+        node *newMinNode = rootList->children[0];
 
         for (int i = 1; i < rootList->children.size(); i++)
         {
-            if (minNode == NULL || rootList->children[i]->value < newMin->value)
+            if (minNode == NULL || rootList->children[i]->value < newMinNode->value)
             {
-                newMin = rootList->children[i];
+                newMinNode = rootList->children[i];
             }
         }
+        minNode = newMinNode;
     }
 
     /* Move a node into the root list */
@@ -197,12 +198,6 @@ public:
         if (n == NULL)
         {
             exit(1);
-        }
-
-        if (n == minNode)
-        {
-            cout << "Removing node is the min node" << endl;
-            minNode->value = 99999999;
         }
 
         if (!inRootList(n))
