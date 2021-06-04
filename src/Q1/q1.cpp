@@ -145,6 +145,7 @@ private:
             }
         }
         cout << "[!] Could not find the value (" << valueToFind << ") in the heap." << endl;
+        exit(1);
         return NULL;
     }
 
@@ -158,6 +159,32 @@ private:
                 n->parent->children.erase(n->parent->children.begin() + i);
             }
         }
+    }
+
+    /* Remove a node by its pointer from the fib. heap */
+    void removeNode(node *n)
+    {
+        if (!inRootList(n))
+        {
+            // If the node's parent is already a looser
+            if (n->parent->looser)
+            {
+                removeNode(n->parent);
+            }
+            else
+            {
+                n->parent->looser = true;
+            }
+            removeFromParentsChildren(n);
+            moveToRootList(n);
+        }
+        removeFromParentsChildren(n);
+        for (int i = 0; i < n->children.size(); i++)
+        {
+            moveToRootList(n->children[i]);
+        }
+        n = NULL;
+        cleanup();
     }
 
 public:
@@ -190,32 +217,11 @@ public:
         cout << "Min Node: " << (minNode == NULL ? "N/A" : to_string(minNode->value)) << endl;
     }
 
-    /* Remove a value from the fib. heap */
+    /* Remove a node by its value from the fib. heap */
     void remove(int value)
     {
         node *n = find(value);
-
-        if (n == NULL)
-        {
-            exit(1);
-        }
-
-        if (!inRootList(n))
-        {
-            removeFromParentsChildren(n);
-            moveToRootList(n);
-        }
-
-        removeFromParentsChildren(n);
-
-        for (int i = 0; i < n->children.size(); i++)
-        {
-            moveToRootList(n->children[i]);
-        }
-
-        n = NULL;
-
-        cleanup();
+        removeNode(n);
     }
 };
 
