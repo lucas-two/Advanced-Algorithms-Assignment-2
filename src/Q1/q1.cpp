@@ -194,14 +194,21 @@ private:
         cleanup();
     }
 
-public:
-    FibonacciHeap()
+    /* Priting children of a node */
+    void printChildren(node *n)
     {
-        rootList = createNewNode(-1, NULL);
+        for (int i = 0; i < n->children.size(); i++)
+        {
+            cout << n->children[i]->value << " " << n->value;
+            if (!n->children[i]->children.empty())
+            {
+                printChildren(n->children[i]);
+            }
+        }
     }
 
     /* Display the root list */
-    void printChildren(node *n)
+    void printChildrenFromStructure(node *n)
     {
         for (int i = 0; i < n->children.size(); i++)
         {
@@ -210,16 +217,28 @@ public:
             if (!n->children[i]->children.empty())
             {
                 cout << "[ ";
-                printChildren(n->children[i]);
+                printChildrenFromStructure(n->children[i]);
             }
         }
         cout << endl;
     }
 
-    /* Display the root list */
+public:
+    FibonacciHeap()
+    {
+        rootList = createNewNode(-1, NULL);
+    }
+
+    /* Display structure of the heap */
+    void printHeapStructure()
+    {
+        cout << "Heap structure:" << endl;
+        printChildrenFromStructure(rootList);
+    }
+
+    /* Priting out the heap */
     void printHeap()
     {
-        cout << "Heap:" << endl;
         printChildren(rootList);
     }
 
@@ -231,9 +250,9 @@ public:
     }
 
     /* Return the max value in the fib. heap */
-    void getMax()
+    int getMax()
     {
-        cout << "Max Node: " << (maxNode == NULL ? "N/A" : to_string(maxNode->value)) << endl;
+        return maxNode->value;
     }
 
     /* Remove a node by its value from the fib. heap */
@@ -241,6 +260,12 @@ public:
     {
         node *n = find(value);
         removeNode(n);
+    }
+
+    /* Remove the max node */
+    void removeMax()
+    {
+        removeNode(maxNode);
     }
 };
 
@@ -252,6 +277,7 @@ private:
     vector<int> numbers;
     FibonacciHeap kSmallestNumbers;
 
+    /* Checks if a number is in the numbers list */
     bool numberInList(int num)
     {
         for (int i = 0; i < numbers.size(); i++)
@@ -272,35 +298,47 @@ private:
             bool uniqueNumberFound = false;
             while (!uniqueNumberFound)
             {
-                int randomNumber = rand() % (N * 10);
-                if (!numberInList(randomNumber))
+                int numberToInsert = rand() % (N * 10);
+                if (!numberInList(numberToInsert))
                 {
-                    numbers.push_back(randomNumber);
+                    numbers.push_back(numberToInsert);
+
+                    // Storing the k-smallest
+                    if (currentKNodes < K)
+                    {
+                        kSmallestNumbers.insert(numberToInsert);
+                        currentKNodes += 1;
+                    }
+                    else
+                    {
+                        if (numberToInsert < kSmallestNumbers.getMax())
+                        {
+                            kSmallestNumbers.removeMax();
+                            kSmallestNumbers.insert(numberToInsert);
+                        }
+                    }
                     uniqueNumberFound = true;
                 }
             }
         }
     }
 
-    void insertToKSmallest(int value)
-    {
-        currentKNodes += 1;
-        kSmallestNumbers.insert(value);
-    }
-
-    void removeFromKSmallest(int value)
-    {
-        currentKNodes -= 1;
-        kSmallestNumbers.remove(value);
-    }
-
     /* Print out all numbers */
     void printNumbers()
     {
-        for (const int &num : numbers)
+        cout << "Numbers: ";
+        for (int i = 0; i < numbers.size(); i++)
         {
-            cout << num << endl;
+            cout << numbers[i] << " ";
         }
+        cout << endl;
+    }
+
+    void printKSmallestNumbers()
+    {
+        cout << "K-Smallest Numbers: ";
+        kSmallestNumbers.printHeap();
+        cout << endl;
     }
 
 public:
@@ -311,31 +349,32 @@ public:
         srand(seed);
         generateRandomNumbers();
         printNumbers();
+        printKSmallestNumbers();
     }
 };
 
 int main()
 {
-    // KSmallest ks(10, 3);
+    KSmallest ks(10, 3);
 
-    FibonacciHeap fh;
-    fh.insert(5);
-    fh.insert(3);
-    fh.insert(6);
-    fh.insert(7);
-    fh.insert(2);
-    fh.insert(8);
-    fh.insert(12);
-    fh.insert(14);
-    fh.insert(1);
-    fh.insert(23);
-    fh.insert(19);
-    fh.printHeap();
-    fh.getMax();
-    fh.remove(2);
-    fh.getMax();
-    fh.remove(3);
-    fh.printHeap();
+    // FibonacciHeap fh;
+    // fh.insert(5);
+    // fh.insert(3);
+    // fh.insert(6);
+    // fh.insert(7);
+    // fh.insert(2);
+    // fh.insert(8);
+    // fh.insert(12);
+    // fh.insert(14);
+    // fh.insert(1);
+    // fh.insert(23);
+    // fh.insert(19);
+    // fh.printHeap();
+    // fh.getMax();
+    // fh.remove(2);
+    // fh.getMax();
+    // fh.remove(3);
+    // fh.printHeap();
 
     return 0;
 }
