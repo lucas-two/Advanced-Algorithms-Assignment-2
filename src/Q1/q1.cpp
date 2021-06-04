@@ -16,6 +16,7 @@ private:
     };
     node *minNode = NULL;
     node *rootList = NULL;
+    vector<node *> map;
 
     /* Create a new node */
     node *createNewNode(int value, node *parentNode)
@@ -26,7 +27,7 @@ private:
         return newNode;
     }
 
-    /* Cleanup nodes with same degree */
+    /* Clean up nodes with same degree */
     void cleanup()
     {
         bool unionFound = true;
@@ -34,6 +35,7 @@ private:
         {
             unionFound = findUnion();
         }
+        updateMinNode();
     }
 
     /* Find and union the nodes with same degree */
@@ -101,6 +103,59 @@ private:
         }
     }
 
+    /* Return if a node is in the root list */
+    bool inRootList(node *n)
+    {
+        return n->parent == NULL;
+    }
+
+    /* 
+    Find the pointer to a node by it's value
+
+    NOTE: This will give us a find of O(K). An alternative would
+    be to use a hashmap, but since space efficency must be O(K + N)
+    I decided against doing that. 
+    */
+    node *find(int valueToFind)
+    {
+        vector<node *> queue;
+        queue.push_back(rootList);
+
+        while (!queue.empty())
+        {
+            node *current = queue[0];
+            queue.erase(queue.begin());
+
+            for (int i = 0; i < current->children.size(); i++)
+            {
+                if (current->children[i]->value == valueToFind)
+                {
+                    return current->children[i];
+                }
+                // don't search the branch if the value is bigger than
+                // the one we're looking for.
+                if (current->children[i]->value < valueToFind)
+                {
+                    queue.push_back(current->children[i]);
+                }
+            }
+        }
+        cout << "[!] Could not find the value (" << valueToFind << ") in the heap." << endl;
+        return NULL;
+    }
+
+    /* Removes a node from its parent's children */
+    void removeFromParentsChildren(node *n)
+    {
+        for (int i = 0; i < n->parent->children.size(); i++)
+        {
+            if (n == n->parent->children[i])
+            {
+                n->parent->children.erase(n->parent->children.begin() + i);
+            }
+        }
+    }
+
 public:
     FibonacciHeap()
     {
@@ -132,16 +187,28 @@ public:
     }
 
     /* Remove a value from the fib. heap */
-    void remove()
+    void remove(int value)
     {
-        // Is the node in the root list?
-        // Delete it.
-        // -> Promote it's children to the root list.
+        node *n = find(value);
 
-        // Otherwise...
-        //  Move the node to the root list
-        // Delete it.
-        // -> Promote it's children to the root list.
+        if (n == NULL)
+        {
+            exit(1);
+        }
+
+        if (!inRootList(n))
+        {
+            removeFromParentsChildren(n);
+        }
+
+        for (int i = 0; i < n->children.size(); i++)
+        {
+            moveToRootList(n->children[i]);
+        }
+
+        n = NULL;
+
+        cleanup();
     }
 };
 
@@ -211,8 +278,13 @@ int main()
     fh.insert(5);
     fh.insert(3);
     fh.insert(6);
+    fh.insert(7);
+    fh.insert(2);
+    fh.insert(8);
+    fh.insert(12);
     fh.printRootList();
     fh.getMin();
+    fh.remove(3);
 
     return 0;
 }
