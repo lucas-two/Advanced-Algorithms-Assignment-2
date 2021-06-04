@@ -13,8 +13,8 @@ private:
         node *parent;
         vector<node *> children;
     };
-    node *minNode;
-    node *rootList;
+    node *minNode = NULL;
+    node *rootList = NULL;
 
     /* Create a new node */
     node *createNewNode(int value, node *parentNode)
@@ -93,30 +93,48 @@ private:
         n->parent = NULL;
         n->looser = false;
         rootList->children.push_back(n);
+
+        if (minNode == NULL || n->value < minNode->value)
+        {
+            minNode = n;
+        }
+    }
+
+public:
+    FibonacciHeap()
+    {
+        rootList = createNewNode(-1, NULL);
     }
 
     /* Display the root list */
     void printRootList()
     {
         cout << "Root List: ";
-        for (int i = 1; i < rootList->children.size(); i++)
+        for (int i = 0; i < rootList->children.size(); i++)
         {
             cout << rootList->children[i]->value << " ";
         }
+        cout << endl;
     }
 
-public:
     /* Insert a value into the fib. heap */
     void insert(int value)
     {
         node *nodeToInsert = createNewNode(value, NULL);
-        rootList->children.push_back(nodeToInsert);
+        moveToRootList(nodeToInsert);
     }
 
     /* Return the min value in the fib. heap */
-    int getMin()
+    void getMin()
     {
-        return minNode->value;
+        if (minNode == NULL)
+        {
+            cout << "No min node" << endl;
+        }
+        else
+        {
+            cout << "Min node: " << minNode->value << endl;
+        }
     }
 
     /* Remove a value from the fib. heap */
@@ -182,7 +200,15 @@ public:
 
 int main()
 {
-    KSmallest ks(10, 3);
+    // KSmallest ks(10, 3);
+
+    FibonacciHeap fh;
+
+    fh.insert(5);
+    fh.insert(3);
+    fh.insert(6);
+    fh.printRootList();
+    fh.getMin();
 
     return 0;
 }
