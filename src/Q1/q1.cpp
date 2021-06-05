@@ -17,7 +17,7 @@ private:
     node *maxNode = NULL;
     node *rootList = NULL;
     vector<node *> map;
-    int nodeCount;
+    int nodeCount = 0;
 
     /* Create a new node */
     node *createNewNode(int value, node *parentNode)
@@ -264,7 +264,6 @@ class KSmallest
 {
 private:
     int N, K;
-    int currentKNodes = 0;
     vector<int> numbers;
     FibonacciHeap kSmallestNumbers;
 
@@ -295,10 +294,9 @@ private:
                     numbers.push_back(numberToInsert);
 
                     // Storing the k-smallest
-                    if (currentKNodes < K)
+                    if (kSmallestNumbers.getNodeCount() < K)
                     {
                         kSmallestNumbers.insert(numberToInsert);
-                        currentKNodes += 1;
                     }
                     else
                     {
@@ -313,14 +311,6 @@ private:
             }
         }
     }
-
-    // void generateKSmallest()
-    // {
-    //     for (int i = 0; i < N; i++)
-    //     {
-
-    //     }
-    // }
 
 public:
     KSmallest(int noElements, int noKSmallestElements, int seed = 0)
@@ -349,28 +339,11 @@ public:
         kSmallestNumbers.printHeap();
         cout << endl;
     }
-
-    /* Remove a value from the list */
-    void removeNumber(int value)
-    {
-        for (int i = 0; i < numbers.size(); i++)
-        {
-            if (numbers[i] == value)
-            {
-                numbers.erase(numbers.begin() + i);
-                kSmallestNumbers.remove(value);
-            }
-        }
-    }
 };
 
 int main()
 {
-    KSmallest ks(10, 2);
-    ks.printNumbers();
-    ks.printKSmallestNumbers();
-    ks.removeNumber(12);
-    cout << "Removal..." << endl;
+    KSmallest ks(10, 3);
     ks.printNumbers();
     ks.printKSmallestNumbers();
     return 0;
