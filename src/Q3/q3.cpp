@@ -1,19 +1,39 @@
 /* Q3. Red Black Tree vs. Van Emde Boas Tree*/
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
-class VEB
+class VanEmdeBoasTree
 {
-    // We have a universe of keys
-    // But we only have a subset of those keys
-    // as actual keys.
+    struct node
+    {
+        int amountOfKeys, max, min;
+        node *summary;
+        vector<node *> childClusters;
+    };
 
-    // Tree stores a set of keys from the universe
-    // Keys must be integers
+private:
+public:
+    /* Insert a node into the tree */
+    void insert()
+    {
+    }
 
-    // We have a big array of size U (universe)
-    // And we mark 1 in the indicies that we have keys for
+    /* Remove a node to the tree */
+    void remove()
+    {
+    }
+
+    /* Find a node in the tree */
+    void find()
+    {
+    }
+
+    /* Access nodes sequentially in the tree */
+    void acessSequentially()
+    {
+    }
 };
 
 class RedBlackTree
@@ -93,7 +113,6 @@ private:
             else
             {
                 nodePointer->left = createNewNode(value, nodePointer);
-                cout << "Im about to fix..." << nodePointer->left->value << endl;
                 fixViolations(nodePointer->left);
             }
         }
@@ -143,7 +162,6 @@ private:
 
     void fixViolations(node *Z)
     {
-        cout << "You're now in the process of fixing..." << Z->value << endl;
         // CASE I: Z is the root node
         if (Z == rootPointer)
         {
@@ -153,13 +171,8 @@ private:
         // If Z's parent is the root, the tree should be fine
         else if (Z->parent->value == rootPointer->value)
         {
-            cout << "Me: " << Z->value << endl;
-            cout << "My parent: " << Z->parent->value << endl;
-            cout << "Root: " << rootPointer->value << endl;
             return;
         }
-
-        // If Z has no uncle, but
 
         // CASE II: Z's uncle is red
         // -> (Parent is left child)
@@ -246,11 +259,18 @@ private:
         nodePointer = X;
     }
 
-    void search()
+    /* Remove a node to the tree */
+    void remove()
     {
     }
 
-    void remove()
+    /* Find a node in the tree */
+    void find()
+    {
+    }
+
+    /* Access nodes sequentially in the tree */
+    void acessSequentially()
     {
     }
 
@@ -274,15 +294,14 @@ public:
 
 int main()
 {
-    RedBlackTree rbt;
+    RedBlackTree rb;
+    VanEmdeBoasTree veb;
 
-    rbt.insert(5);
-    rbt.insert(4);
-    rbt.insert(1);
-    rbt.insert(10);
-    rbt.insert(11);
-    // rbt.insert(4);
-    // rbt.insert(6);
-    rbt.printTree();
+    rb.insert(5);
+    rb.insert(4);
+    rb.insert(1);
+    rb.insert(10);
+    rb.insert(11);
+
     return 0;
 }
