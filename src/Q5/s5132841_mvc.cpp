@@ -203,45 +203,6 @@ public:
         }
     }
 
-    // MinimumVertexCover()
-    // {
-    //     cout << "Create edges" << endl;
-    //     edge e1 = {e1.from = 1, e1.to = 2};
-    //     edge e2 = {e2.from = 2, e2.to = 3};
-    //     edge e3 = {e3.from = 3, e3.to = 6};
-    //     edge e4 = {e4.from = 6, e4.to = 9};
-    //     edge e5 = {e5.from = 9, e5.to = 8};
-    //     edge e6 = {e6.from = 8, e6.to = 7};
-    //     edge e7 = {e7.from = 7, e7.to = 4};
-    //     edge e8 = {e8.from = 4, e8.to = 1};
-    //     edge e9 = {e9.from = 5, e9.to = 2};
-    //     edge e10 = {e10.from = 5, e10.to = 4};
-    //     edge e11 = {e11.from = 5, e11.to = 8};
-    //     edge e12 = {e12.from = 5, e12.to = 6};
-
-    //     edges.push_back(e1);
-    //     edges.push_back(e2);
-    //     edges.push_back(e3);
-    //     edges.push_back(e4);
-    //     edges.push_back(e5);
-    //     edges.push_back(e6);
-    //     edges.push_back(e7);
-    //     edges.push_back(e8);
-    //     edges.push_back(e9);
-    //     edges.push_back(e10);
-    //     edges.push_back(e11);
-    //     edges.push_back(e12);
-
-    //     noOfEdges = 12;
-    //     noOfNodes = 9;
-
-    //     extractNodes();
-
-    //     node *startNode = getStartNode();
-    //     findMinCover(startNode);
-    //     cout << "Verticies Covered: " << verticiesCovered << endl;
-    // }
-
     /* Print out the edges of the graph */
     void printEdges()
     {
