@@ -23,19 +23,21 @@ private:
     };
     int noOfNodes, noOfEdges;
     int verticiesCovered = 0;
+    int seenNodes = 0;
     vector<edge> edges;
     vector<node> nodes;
 
     /* Finds the minimum vertex cover */
     void findMinCover(node *startNode)
     {
-        vector<node *> queue;
-        queue.push_back(startNode);
+        cout << "Calculating min cover..." << endl;
+        vector<node *> priorityQueue;
+        priorityQueue.push_back(startNode);
 
-        while (!queue.empty())
+        while (seenNodes != noOfNodes && !priorityQueue.empty())
         {
-            node *current = queue[0];
-            queue.erase(queue.begin());
+            node *current = priorityQueue[0];
+            priorityQueue.erase(priorityQueue.begin());
 
             if (!current->visited)
             {
@@ -44,41 +46,38 @@ private:
 
                 if (!current->connections.empty())
                 {
-                    node *bestChild = findNode(current->connections[0]);
                     for (int i = 1; i < current->connections.size(); i++)
                     {
                         node *childNode = findNode(current->connections[i]);
 
-                        if (childNode->unseenConnections > bestChild->unseenConnections)
+                        if (!childNode->seen)
                         {
-                            bestChild = childNode;
+                            childNode->seen = true;
+                            seenNodes += 1;
                         }
+                        // Insert the child at the front of the queue if it's larger than the current largest node
+                        // Allows it to act as a priority queue
+                        if (!priorityQueue.empty())
+                        {
+                            if (childNode->unseenConnections > priorityQueue[0]->unseenConnections)
+                            {
+                                priorityQueue.insert(priorityQueue.begin(), childNode);
+                            }
+                            else
+                            {
+                                priorityQueue.push_back(childNode);
+                            }
+                        }
+                        else
+                        {
+                            priorityQueue.push_back(childNode);
+                        }
+
+                        updateAllWithSeenNode(childNode->id);
                     }
-                    queue.push_back(bestChild);
-                    bestChild->seen = true;
-                    updateAllWithSeenNode(bestChild->id);
                 }
             }
         }
-        // Check if there are any disconnected nodes
-        node *seperatedNode = checkIfAnyNodesUnseen();
-        if (seperatedNode != NULL)
-        {
-            findMinCover(seperatedNode);
-        }
-    }
-
-    /* Check if any nodes left in the graph are unseen (for if the graph is disconnected) */
-    node *checkIfAnyNodesUnseen()
-    {
-        for (int i = 0; i < nodes.size(); i++)
-        {
-            if (!nodes[i].seen)
-            {
-                return &nodes[i];
-            }
-        }
-        return NULL;
     }
 
     /* Update all nodes where a specific node appears as their child */
@@ -142,6 +141,8 @@ private:
     /* Extract the nodes from the edges */
     void extractNodes()
     {
+        cout << "Extracting edges" << endl;
+
         for (int nodeId = 1; nodeId <= noOfNodes; nodeId++)
         {
             node n;
@@ -160,9 +161,6 @@ private:
             }
             n.unseenConnections = n.connections.size();
             nodes.push_back(n);
-            node *startNode = getStartNode();
-            findMinCover(startNode);
-            cout << "Verticies Covered: " << verticiesCovered << endl;
         }
     }
 
@@ -196,9 +194,53 @@ public:
                 }
             }
             inputFile.close();
+
             extractNodes();
+
+            node *startNode = getStartNode();
+            findMinCover(startNode);
+            cout << "Verticies Covered: " << verticiesCovered << endl;
         }
     }
+
+    // MinimumVertexCover()
+    // {
+    //     cout << "Create edges" << endl;
+    //     edge e1 = {e1.from = 1, e1.to = 2};
+    //     edge e2 = {e2.from = 2, e2.to = 3};
+    //     edge e3 = {e3.from = 3, e3.to = 6};
+    //     edge e4 = {e4.from = 6, e4.to = 9};
+    //     edge e5 = {e5.from = 9, e5.to = 8};
+    //     edge e6 = {e6.from = 8, e6.to = 7};
+    //     edge e7 = {e7.from = 7, e7.to = 4};
+    //     edge e8 = {e8.from = 4, e8.to = 1};
+    //     edge e9 = {e9.from = 5, e9.to = 2};
+    //     edge e10 = {e10.from = 5, e10.to = 4};
+    //     edge e11 = {e11.from = 5, e11.to = 8};
+    //     edge e12 = {e12.from = 5, e12.to = 6};
+
+    //     edges.push_back(e1);
+    //     edges.push_back(e2);
+    //     edges.push_back(e3);
+    //     edges.push_back(e4);
+    //     edges.push_back(e5);
+    //     edges.push_back(e6);
+    //     edges.push_back(e7);
+    //     edges.push_back(e8);
+    //     edges.push_back(e9);
+    //     edges.push_back(e10);
+    //     edges.push_back(e11);
+    //     edges.push_back(e12);
+
+    //     noOfEdges = 12;
+    //     noOfNodes = 9;
+
+    //     extractNodes();
+
+    //     node *startNode = getStartNode();
+    //     findMinCover(startNode);
+    //     cout << "Verticies Covered: " << verticiesCovered << endl;
+    // }
 
     /* Print out the edges of the graph */
     void printEdges()
