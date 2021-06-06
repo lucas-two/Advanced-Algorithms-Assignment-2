@@ -13,8 +13,14 @@ private:
     {
         int from, to;
     };
+    struct node
+    {
+        int id;
+        vector<int> connections;
+    };
     int noOfNodes, noOfEdges;
-    vector<edge> graph;
+    vector<edge> edges;
+    vector<node> nodes;
 
     /* Splitting the input */
     vector<string> tokenize(string text, string delimiter)
@@ -33,8 +39,31 @@ private:
             end = text.find(delimiter, start);
         }
         words.push_back(text.substr(start, end - start));
-
         return words;
+    }
+
+    /* Extract the nodes from the edges */
+    void extractNodes()
+    {
+        for (int nodeId = 1; nodeId <= noOfNodes; nodeId++)
+        {
+            node n;
+            n.id = nodeId;
+            n.connections = {};
+
+            for (int i = 0; i < noOfEdges; i++)
+            {
+                if (nodeId == edges[i].to)
+                {
+                    n.connections.push_back(edges[i].from);
+                }
+                else if (nodeId == edges[i].from)
+                {
+                    n.connections.push_back(edges[i].to);
+                }
+            }
+            nodes.push_back(n);
+        }
     }
 
 public:
@@ -56,7 +85,7 @@ public:
                 {
                     vector<string> graphEdgeInfo = tokenize(s, " ");
                     edge e = {e.from = stoi(graphEdgeInfo[1]), e.to = stoi(graphEdgeInfo[2])};
-                    graph.push_back(e);
+                    edges.push_back(e);
                 }
                 // Extract node and edge count
                 else if (s[0] == 'p')
@@ -67,15 +96,30 @@ public:
                 }
             }
             inputFile.close();
+            extractNodes();
         }
     }
 
     /* Print out the edges of the graph */
-    void printGraph()
+    void printEdges()
     {
-        for (int i = 0; i < graph.size(); i++)
+        for (int i = 0; i < edges.size(); i++)
         {
-            cout << graph[i].from << " -> " << graph[i].to << endl;
+            cout << edges[i].from << " -> " << edges[i].to << endl;
+        }
+    }
+
+    /* Print out the nodes of the graph */
+    void printNodes()
+    {
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            cout << "[" << nodes[i].id << "]:";
+            for (int j = 0; j < nodes[i].connections.size(); j++)
+            {
+                cout << " " << nodes[i].connections[j];
+            }
+            cout << endl;
         }
     }
 };
@@ -88,5 +132,6 @@ int main(int argc, char *argv[])
         return -1;
     }
     MinimumVertexCover mvc(argv[1]);
+    mvc.printNodes();
     return 0;
 }
