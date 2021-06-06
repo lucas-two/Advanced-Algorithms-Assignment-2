@@ -17,10 +17,107 @@ private:
     {
         int id;
         vector<int> connections;
+        int unseenConnections;
+        bool visited = false;
+        bool seen = false;
     };
     int noOfNodes, noOfEdges;
+    int verticiesCovered = 0;
     vector<edge> edges;
     vector<node> nodes;
+
+    /* Finds the minimum vertex cover */
+    void findMinCover(node *startNode)
+    {
+        vector<node *> queue;
+        queue.push_back(startNode);
+
+        while (!queue.empty())
+        {
+            node *current = queue[0];
+            queue.erase(queue.begin());
+
+            if (!current->visited)
+            {
+                current->visited = true;
+                verticiesCovered += 1;
+
+                if (!current->connections.empty())
+                {
+                    node *bestChild = findNode(current->connections[0]);
+                    for (int i = 1; i < current->connections.size(); i++)
+                    {
+                        node *childNode = findNode(current->connections[i]);
+
+                        if (childNode->unseenConnections > bestChild->unseenConnections)
+                        {
+                            bestChild = childNode;
+                        }
+                    }
+                    queue.push_back(bestChild);
+                    bestChild->seen = true;
+                    updateAllWithSeenNode(bestChild->id);
+                }
+            }
+        }
+        // Check if there are any disconnected nodes
+        node *seperatedNode = checkIfAnyNodesUnseen();
+        if (seperatedNode != NULL)
+        {
+            findMinCover(seperatedNode);
+        }
+    }
+
+    /* Check if any nodes left in the graph are unseen (for if the graph is disconnected) */
+    node *checkIfAnyNodesUnseen()
+    {
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            if (!nodes[i].seen)
+            {
+                return &nodes[i];
+            }
+        }
+        return NULL;
+    }
+
+    /* Update all nodes where a specific node appears as their child */
+    void updateAllWithSeenNode(int id)
+    {
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            for (int j = 0; j < nodes[i].connections.size(); j++)
+            {
+                if (nodes[i].connections[j] == id)
+                {
+                    nodes[i].unseenConnections -= 1;
+                }
+            }
+        }
+    }
+
+    /* Find the node with the most connections */
+    node *getStartNode()
+    {
+        node *topNode = &nodes[0];
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            node *comparisonNode = &nodes[i];
+
+            if (comparisonNode->unseenConnections > topNode->unseenConnections)
+            {
+                topNode = comparisonNode;
+            }
+        }
+        return topNode;
+    }
+
+    /* Find a specific node from its ID */
+    node *findNode(int id)
+    {
+        // Given the nature of the ids, we can just use id - 1 to find its location
+        return &nodes[id - 1];
+    }
 
     /* Splitting the input */
     vector<string> tokenize(string text, string delimiter)
@@ -50,7 +147,6 @@ private:
             node n;
             n.id = nodeId;
             n.connections = {};
-
             for (int i = 0; i < noOfEdges; i++)
             {
                 if (nodeId == edges[i].to)
@@ -62,7 +158,11 @@ private:
                     n.connections.push_back(edges[i].to);
                 }
             }
+            n.unseenConnections = n.connections.size();
             nodes.push_back(n);
+            node *startNode = getStartNode();
+            findMinCover(startNode);
+            cout << "Verticies Covered: " << verticiesCovered << endl;
         }
     }
 
@@ -132,6 +232,5 @@ int main(int argc, char *argv[])
         return -1;
     }
     MinimumVertexCover mvc(argv[1]);
-    mvc.printNodes();
     return 0;
 }
